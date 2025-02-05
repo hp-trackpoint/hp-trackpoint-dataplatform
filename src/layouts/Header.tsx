@@ -75,16 +75,10 @@ export default function AppHeader() {
       }}
     >
       {/* 左侧：Logo + 分析页面切换菜单（待定） */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+      <div>
         {/* Logo：点击跳转到主页 */}
-        <div>
-          <Link to="/">
-            <img
-              src="/logo.png" // *待替换
-              alt="Logo"
-              style={{ height: '40px' }}
-            />
-          </Link>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="/src/img/icon.png" alt="Logo" style={{ height: '60px' }} />
         </div>
       </div>
 
@@ -99,10 +93,10 @@ export default function AppHeader() {
           <Typography.Link>
             <Space>
               <Avatar
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', height: '40px', width: '40px' }}
                 src="/avatar.png" // *待替换
               />
-              <DownOutlined />
+              <DownOutlined style={{ fontSize: '10px' }} />
             </Space>
           </Typography.Link>
         </Dropdown>
