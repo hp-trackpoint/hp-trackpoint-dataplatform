@@ -1,56 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { DatePickerProps } from 'antd';
 import { DatePicker, Row, Col, Card, Skeleton } from 'antd';
-// import type { Dayjs } from 'dayjs';
-// import axios from 'axios';
+import dayjs from 'dayjs';
 
 interface CardItem {
   id: number;
   title: string;
-  content: string; // 根据实际接口字段修改
-  createdAt?: string; // 可选字段示例
-  description?: string; // 可选字段示例
+  content?: string;
+  createdAt?: string;
+  description?: string;
 }
 
-const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-  console.log(date, dateString);
-};
+const DEBOUNCE_DELAY = 300; // 防抖延迟时间（毫秒）
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<CardItem[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const debounceTimer = useRef<number | null>(null);
+
+  // 防抖处理日期变化
+  const onChange: DatePickerProps['onChange'] = (date) => {
+    // 清除之前的定时器
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // 设置新的定时器
+    debounceTimer.current = window.setTimeout(() => {
+      if (date) {
+        const formattedDate = dayjs(date).format('YYYY-MM-DD');
+        setSelectedDate(formattedDate);
+      } else {
+        setSelectedDate(null);
+      }
+    }, DEBOUNCE_DELAY);
+  };
+
+  // 组件卸载时清除定时器
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
-    // 模拟数据获取
     const fetchData = async () => {
       try {
-        // const { data } = await axios.get('your-api-endpoint');
-        // setData(data);
-        const example1: CardItem = {
-          id: 1,
-          title: 'Example 1',
-          content: 'Hello from Example 1',
-          createdAt: '2023-10-01',
-          description: 'This is the first example',
-        };
+        setLoading(true);
 
-        const example2: CardItem = {
-          id: 2,
-          title: 'Example 2',
-          content: 'Hello from Example 2',
-          createdAt: '2023-10-02',
-          description: 'This is the second example',
-        };
+        // 模拟请求（替换为实际接口调用）
+        const mockData = [
+          {
+            id: 1,
+            title: 'Example 1',
+            createdAt: '2025-01-31',
+            description: 'Data for 2023-01-31',
+          },
+          {
+            id: 2,
+            title: 'Example 2',
+            createdAt: '2025-02-01',
+            description: 'Data for 2025-02-01',
+          },
+          {
+            id: 3,
+            title: 'Example 3',
+            createdAt: '2025-02-02',
+            description: 'Data for 2023-02-02',
+          },
+        ];
 
-        const example3: CardItem = {
-          id: 3,
-          title: 'Example 3',
-          content: 'Hello from Example 3',
-          createdAt: '2023-10-03',
-          description: 'This is the third example',
-        };
+        // 根据日期过滤
+        const filteredData = selectedDate
+          ? mockData.filter((item) => item.createdAt === selectedDate)
+          : mockData;
 
-        setData([example1, example2, example3]);
+        setData(filteredData);
       } catch (err) {
         console.error('数据加载失败:', err);
       } finally {
@@ -59,7 +88,7 @@ const HomePage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedDate]);
 
   return (
     <div>
@@ -69,22 +98,13 @@ const HomePage: React.FC = () => {
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : (
           <Row gutter={[16, 16]}>
-            {' '}
-            {/* 水平间距16px，垂直间距16px */}
-            {data.map((item: CardItem) => (
-              <Col
-                key={item.id} // 使用数据唯一标识
-                xs={24} // 手机端全宽
-                sm={12} // 平板端半宽
-                md={12} // 桌面端半宽
-                lg={12} // 大屏幕半宽
-                xl={12} // 超大屏幕半宽
-              >
+            {data.map((item) => (
+              <Col key={item.id} xs={24} sm={12} md={12} lg={12} xl={12}>
                 <Card
                   title={item.title}
                   bordered={false}
                   hoverable
-                  style={{ height: 200 }} // 统一高度示例
+                  style={{ height: 200 }}
                 >
                   <p>{item.description || 'No description available'}</p>
                   <p>创建时间：{item.createdAt || 'Unknown'}</p>
