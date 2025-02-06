@@ -8,6 +8,8 @@ import {
   SlidersOutlined,
   TeamOutlined,
   FundViewOutlined,
+  ProfileOutlined,
+  ReconciliationOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 
@@ -22,6 +24,25 @@ const items: MenuItem[] = [
     label: <Link to="/">数据总览</Link>,
   },
   {
+    //埋点管理
+    key: 'datamanagement',
+    icon: <ProfileOutlined />,
+    label: '埋点管理',
+
+    children: [
+      //模块
+      {
+        key: 'modulemanagement',
+        label: <Link to="/modulemanagement">模块管理</Link>,
+      },
+      //页面
+      {
+        key: 'pagemanagement',
+        label: <Link to="/pagemanagement">页面管理</Link>,
+      },
+    ],
+  },
+  {
     key: 'trendanalysis',
     icon: <LineChartOutlined />,
     label: <Link to="/trendanalysis">趋势分析</Link>,
@@ -29,39 +50,73 @@ const items: MenuItem[] = [
   {
     key: 'visitoranalysis',
     icon: <UserOutlined />,
-    label: <Link to="/visitoranalysis">访客分析</Link>,
-  },
-  {
-    key: 'visitanalysis',
-    icon: <SlidersOutlined />,
-    label: <Link to="/visitanalysis">访问分析</Link>,
-  },
-  {
-    key: 'useranalysis',
-    icon: <TeamOutlined />,
-    label: '用户分析',
+    label: '访客分析',
 
     children: [
       {
-        key: 'loyaltyanalysis',
-        label: <Link to="/loyaltyanalysis">忠诚度分析</Link>,
+        key: 'regionanalysis',
+        label: <Link to="/regionanalysis">地域分析</Link>,
       },
       {
-        key: 'userportrait',
-        label: <Link to="/userportrait">用户画像</Link>,
+        //设备分析
+        key: 'deviceanalysis',
+        label: <Link to="/deviceanalysis">设备分析</Link>,
       },
     ],
   },
   {
-    key: 'appcrash',
+    key: 'visitanalysis',
+    icon: <SlidersOutlined />,
+    label: '访问分析',
+
+    children: [
+      {
+        key: 'pageanalysis',
+        label: <Link to="/pageanalysis">受访页面</Link>,
+      },
+      {
+        key: 'entryanalysis',
+        label: <Link to="/entryanalysis">入口页面</Link>,
+      },
+    ],
+  },
+  // {
+  //   key: 'useranalysis',
+  //   icon: <TeamOutlined />,
+  //   label: '用户分析',
+
+  //   children: [
+  //     {
+  //       key: 'loyaltyanalysis',
+  //       label: <Link to="/loyaltyanalysis">忠诚度分析</Link>,
+  //     },
+  //     {
+  //       key: 'userportrait',
+  //       label: <Link to="/userportrait">用户画像</Link>,
+  //     },
+  //   ],
+  // },
+  // {
+  //   key: 'appcrash',
+  //   icon: <FundViewOutlined />,
+  //   label: <Link to="/appcrash">App崩溃分析</Link>,
+  // },
+  {
+    key: 'performanceanalysis',
     icon: <FundViewOutlined />,
-    label: <Link to="/appcrash">App崩溃分析</Link>,
+    label: <Link to="/performanceanalysis">性能分析</Link>,
   },
   {
     key: 'eventanalysis',
-    icon: <FundViewOutlined />,
+    icon: <ReconciliationOutlined />,
     label: <Link to="/eventanalysis">事件分析</Link>,
   },
+  //
+  // {
+  //   key: 'warninganalysis',
+  //   icon: <FundViewOutlined />,
+  //   label: <Link to="/warninganalysis">预警分析</Link>,
+  // },
 ];
 
 const SiderMenu: React.FC = () => {
