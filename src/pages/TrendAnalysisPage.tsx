@@ -108,12 +108,12 @@ export default function TrendAnalysisPage() {
     fetchData();
   }, [time, visitor]);
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>Loading... </p>;
   }
 
-  if (error) {
+  /*  if (error) {
     return <p>Error: {error}</p>;
-  }
+  } */
   const options: CheckboxGroupProps<string>['options'] = [
     { label: '按时', value: 'Hour' },
     { label: '按日', value: 'Day' },
@@ -214,6 +214,7 @@ export default function TrendAnalysisPage() {
         <div style={{ background: '#fff', padding: 0, minHeight: '100vh' }}>
           <p>Content</p>
           <h2>Data:</h2>
+          <h2>Test </h2>
           {data ? (
             <pre>{JSON.stringify(data, null, 2)}</pre>
           ) : (
