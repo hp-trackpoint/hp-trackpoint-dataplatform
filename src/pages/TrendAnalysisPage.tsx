@@ -38,29 +38,29 @@ interface ChartData {
 export default function TrendAnalysisPage() {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartData: ChartData[] = [
-    { time: '00时', pageviews: 1020, visits: 20 },
-    { time: '01时', pageviews: 350, visits: 10 },
-    { time: '02时', pageviews: 50, visits: 5 },
-    { time: '03时', pageviews: 300, visits: 15 },
-    { time: '04时', pageviews: 180, visits: 8 },
-    { time: '05时', pageviews: 150, visits: 6 },
-    { time: '06时', pageviews: 200, visits: 10 },
-    { time: '07时', pageviews: 350, visits: 15 },
-    { time: '08时', pageviews: 1000, visits: 25 },
-    { time: '09时', pageviews: 1700, visits: 30 },
-    { time: '10时', pageviews: 1520, visits: 35 },
-    { time: '11时', pageviews: 1550, visits: 40 },
-    { time: '12时', pageviews: 1800, visits: 45 },
-    { time: '13时', pageviews: 1920, visits: 50 },
-    { time: '14时', pageviews: 2580, visits: 55 },
-    { time: '15时', pageviews: 1900, visits: 60 },
-    { time: '16时', pageviews: 2300, visits: 65 },
-    { time: '17时', pageviews: 1780, visits: 70 },
-    { time: '18时', pageviews: 1850, visits: 75 },
-    { time: '19时', pageviews: 1720, visits: 80 },
-    { time: '20时', pageviews: 1650, visits: 85 },
-    { time: '21时', pageviews: 1580, visits: 90 },
-    { time: '22时', pageviews: 700, visits: 95 },
+    { time: '00时', pageviews: 1020, visits: 200 },
+    { time: '01时', pageviews: 350, visits: 100 },
+    { time: '02时', pageviews: 50, visits: 30 },
+    { time: '03时', pageviews: 300, visits: 100 },
+    { time: '04时', pageviews: 180, visits: 80 },
+    { time: '05时', pageviews: 150, visits: 60 },
+    { time: '06时', pageviews: 200, visits: 100 },
+    { time: '07时', pageviews: 350, visits: 150 },
+    { time: '08时', pageviews: 1000, visits: 250 },
+    { time: '09时', pageviews: 1700, visits: 300 },
+    { time: '10时', pageviews: 1520, visits: 350 },
+    { time: '11时', pageviews: 1550, visits: 400 },
+    { time: '12时', pageviews: 1800, visits: 450 },
+    { time: '13时', pageviews: 1920, visits: 500 },
+    { time: '14时', pageviews: 2580, visits: 550 },
+    { time: '15时', pageviews: 1900, visits: 1000 },
+    { time: '16时', pageviews: 2300, visits: 650 },
+    { time: '17时', pageviews: 1780, visits: 700 },
+    { time: '18时', pageviews: 1850, visits: 750 },
+    { time: '19时', pageviews: 1720, visits: 800 },
+    { time: '20时', pageviews: 1650, visits: 850 },
+    { time: '21时', pageviews: 1580, visits: 900 },
+    { time: '22时', pageviews: 700, visits: 700 },
     { time: '23时', pageviews: 0, visits: 100 },
   ];
   useEffect(() => {
@@ -194,10 +194,10 @@ export default function TrendAnalysisPage() {
       setError(null);
       try {
         // 假设这里是请求的 API 地址，根据 time 和 visitor 拼接参数
-        const response = await axios.get(
-          `https://your-api-url.com/data?time=${time}&visitor=${visitor}`
+        /* const response = await axios.get(
+         `https://your-api-url.com/data?time=${time}&visitor=${visitor}`
         );
-        setData(response.data);
+        setData(response.data); */
       } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err.message);
