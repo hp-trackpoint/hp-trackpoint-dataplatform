@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { TimeSelector } from '../layouts/SelectHeader';
 export default function UserAnalysisPage() {
-  return <div>UserAnalysisPage</div>;
+  return <TimeSelector onChangeTime={() => {}} time="today"></TimeSelector>;
 }

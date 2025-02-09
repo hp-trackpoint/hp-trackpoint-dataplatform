@@ -1,7 +1,6 @@
-import type { RadioChangeEvent, DatePickerProps } from 'antd';
+import type { RadioChangeEvent } from 'antd';
 import type { CheckboxGroupProps } from 'antd/es/checkbox';
 import { Radio, Layout, DatePicker, Card, Space, Table, Tag } from 'antd';
-import type { Dayjs } from 'dayjs';
 import type { TableProps } from 'antd';
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
@@ -17,7 +16,6 @@ import {
 } from '../stores/trendStore';
 import * as echarts from 'echarts';
 
-const getYearMonth = (date: Dayjs) => date.year() * 12 + date.month();
 const { RangePicker } = DatePicker;
 const { Content } = Layout;
 interface DataType {
@@ -121,30 +119,6 @@ export default function TrendAnalysisPage() {
     }
   }, []);
 
-  const disabled6MonthsDate: DatePickerProps['disabledDate'] = (
-    current,
-    { from, type }
-  ) => {
-    if (from) {
-      const minDate = from.add(-5, 'months');
-      const maxDate = from.add(5, 'months');
-
-      switch (type) {
-        case 'year':
-          return (
-            current.year() < minDate.year() || current.year() > maxDate.year()
-          );
-
-        default:
-          return (
-            getYearMonth(current) < getYearMonth(minDate) ||
-            getYearMonth(current) > getYearMonth(maxDate)
-          );
-      }
-    }
-
-    return false;
-  };
   interface ApiResponse {
     // 根据实际的 API 响应结构定义
     message: string;
@@ -528,11 +502,7 @@ export default function TrendAnalysisPage() {
             ]}
           />
         </div>
-        <RangePicker
-          disabledDate={disabled6MonthsDate}
-          picker="month"
-          style={{ marginRight: 40 }}
-        />
+        <RangePicker picker="month" style={{ marginRight: 40 }} />
         <Radio.Group
           block
           options={options}

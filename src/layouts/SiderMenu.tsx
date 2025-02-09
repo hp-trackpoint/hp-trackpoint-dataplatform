@@ -6,7 +6,6 @@ import {
   LineChartOutlined,
   UserOutlined,
   SlidersOutlined,
-  TeamOutlined,
   FundViewOutlined,
   ProfileOutlined,
   ReconciliationOutlined,
