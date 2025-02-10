@@ -7,7 +7,6 @@ import {
   UserOutlined,
   SlidersOutlined,
   FundViewOutlined,
-  ProfileOutlined,
   ReconciliationOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -21,25 +20,6 @@ const items: MenuItem[] = [
     key: 'home',
     icon: <SwitcherOutlined />,
     label: <Link to="/">数据总览</Link>,
-  },
-  {
-    //埋点管理
-    key: 'datamanagement',
-    icon: <ProfileOutlined />,
-    label: '埋点管理',
-
-    children: [
-      //模块
-      {
-        key: 'modulemanagement',
-        label: <Link to="/modulemanagement">模块管理</Link>,
-      },
-      //页面
-      {
-        key: 'pagemanagement',
-        label: <Link to="/pagemanagement">页面管理</Link>,
-      },
-    ],
   },
   {
     key: 'trendanalysis',

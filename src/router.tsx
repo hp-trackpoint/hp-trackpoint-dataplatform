@@ -8,6 +8,9 @@ import UserAnalysisPage from './pages/UserAnalysisPage';
 import VisitAnalysisPage from './pages/VisitAnalysisPage';
 import VisitorAnalysisPage from './pages/VisitorAnalysisPage';
 import NotFoundPage from './pages/NotFound';
+import TrackPointLayout from './layouts/TrackPointLayout';
+import PageTrackPointManagePage from './pages/PageTrackPointManagePage';
+import ModuleTrackPointManagePage from './pages/ModuleTrackPointManagePage';
 
 export const router = createBrowserRouter([
   {
@@ -24,4 +27,12 @@ export const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
+  {
+    path: '/manage',
+    element: <TrackPointLayout />,
+    children: [
+      { path: 'pagemanage', element: <PageTrackPointManagePage /> },
+      { path: 'modulemanage', element: <ModuleTrackPointManagePage /> },
+    ],
+  }
 ]);
