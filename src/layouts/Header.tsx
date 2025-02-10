@@ -16,7 +16,7 @@ const { Header } = Layout;
 type MenuItem = Required<MenuProps>['items'][number];
 const menuItems: MenuItem[] = [
   {
-    label: '数据',
+    label: <Link to="/">数据</Link>,
     key: 'app',
     icon: <AreaChartOutlined />,
   },
@@ -69,7 +69,6 @@ export default function AppHeader() {
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key);
-    
   };
 
   // 格式化日期（仅显示年月日）
