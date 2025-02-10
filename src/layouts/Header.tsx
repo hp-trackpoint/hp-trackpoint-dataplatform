@@ -1,19 +1,76 @@
-import React, { useState } from 'react';
-import { Layout, Dropdown, Avatar, Space, Typography } from 'antd';
+import { useState } from 'react';
+import { Layout, Dropdown, Avatar, Space, Typography, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import {
   UserOutlined,
   SettingOutlined,
   LogoutOutlined,
   DownOutlined,
+  AreaChartOutlined,
 } from '@ant-design/icons';
 
 import type { MenuProps } from 'antd';
 
 const { Header } = Layout;
 
+type MenuItem = Required<MenuProps>['items'][number];
+const menuItems: MenuItem[] = [
+  {
+    label: '数据',
+    key: 'app',
+    icon: <AreaChartOutlined />,
+  },
+  {
+    label: <Link to="/manage">埋点管理</Link>,
+    key: 'mail',
+    icon: <UserOutlined />,
+  },
+];
+
+const items: MenuProps['items'] = [
+  {
+    key: 'profile',
+    label: (
+      <Link to="/profile">
+        <Space>
+          <UserOutlined /> 个人信息
+        </Space>
+      </Link>
+    ),
+  },
+  {
+    key: 'settings',
+    label: (
+      <Link to="/settings">
+        <Space>
+          <SettingOutlined /> 设置
+        </Space>
+      </Link>
+    ),
+  },
+  {
+    type: 'divider',
+  },
+  {
+    key: 'logout',
+    label: (
+      <Link to="/logout">
+        <Space>
+          <LogoutOutlined /> 退出登录
+        </Space>
+      </Link>
+    ),
+  },
+];
+
 export default function AppHeader() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [current, setCurrent] = useState('mail');
+
+  const onClick: MenuProps['onClick'] = (e) => {
+    setCurrent(e.key);
+    
+  };
 
   // 格式化日期（仅显示年月日）
   const formattedTime = currentTime.toLocaleString('zh-CN', {
@@ -21,42 +78,6 @@ export default function AppHeader() {
     month: '2-digit',
     day: '2-digit',
   });
-
-  const items: MenuProps['items'] = [
-    {
-      key: 'profile',
-      label: (
-        <Link to="/profile">
-          <Space>
-            <UserOutlined /> 个人信息
-          </Space>
-        </Link>
-      ),
-    },
-    {
-      key: 'settings',
-      label: (
-        <Link to="/settings">
-          <Space>
-            <SettingOutlined /> 设置
-          </Space>
-        </Link>
-      ),
-    },
-    {
-      type: 'divider',
-    },
-    {
-      key: 'logout',
-      label: (
-        <Link to="/logout">
-          <Space>
-            <LogoutOutlined /> 退出登录
-          </Space>
-        </Link>
-      ),
-    },
-  ];
 
   return (
     <Header
@@ -78,10 +99,20 @@ export default function AppHeader() {
       <div>
         {/* Logo：点击跳转到主页 */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/src/img/icon.png" alt="Logo" style={{ height: '60px' }} />
+          <img
+            src="/src/img/icon.png"
+            alt="Logo"
+            style={{ height: '60px', marginRight: '20px' }}
+          />
+          <Menu
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode="horizontal"
+            items={menuItems}
+          />
         </div>
       </div>
-
+      {/* 埋点管理 */}
       {/* 右侧：日期显示和头像下拉菜单 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         {/* 日期显示 */}

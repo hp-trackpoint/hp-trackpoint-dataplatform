@@ -81,22 +81,22 @@ class Http {
   }
 
   // 封装 GET 请求
-  public get<T = any>(url: string, params?: any) {
+  public get<T = any>(url: string, params?: any): Promise<AxiosResponse<ResponseData<T>, any>> {
     return this.instance.get<ResponseData<T>>(url, { params });
   }
 
   // 封装 POST 请求
-  public post<T = any>(url: string, data?: any) {
+  public post<T = any>(url: string, data?: any): Promise<AxiosResponse<ResponseData<T>, any>>  {
     return this.instance.post<ResponseData<T>>(url, data);
   }
 
   // 封装 PATCH 请求
-  public patch<T = any>(url: string, data?: any) {
+  public patch<T = any>(url: string, data?: any): Promise<AxiosResponse<ResponseData<T>, any>> {
     return this.instance.patch<ResponseData<T>>(url, data);
   }
 
   // 封装 DELETE 请求
-  public delete<T = any>(url: string) {
+  public delete<T = any>(url: string): Promise<AxiosResponse<ResponseData<T>, any>> {
     return this.instance.delete<ResponseData<T>>(url);
   }
 }
