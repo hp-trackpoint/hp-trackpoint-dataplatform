@@ -1,6 +1,18 @@
-import { Button, Table, Modal, Form, Input, Space, message, Switch } from 'antd';
+import {
+  Button,
+  Table,
+  Modal,
+  Form,
+  Input,
+  Space,
+  message,
+  Switch,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import http from '../utils/http';
+import dayjs from 'dayjs';
+import type { ColumnsType } from 'antd/es/table';
+
 interface PageTrackPointData {
   page: number;
   pageSize: number;
@@ -27,7 +39,7 @@ const PageTrackPointManagePage = () => {
     page: 1,
     pageSize: 10,
     total: 0,
-    items: []
+    items: [],
   });
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -42,18 +54,32 @@ const PageTrackPointManagePage = () => {
   const fetchTrackPoints = async (page = 1, pageSize = 10) => {
     setLoading(true);
     try {
-      const data = await http.get<PageTrackPointData>(`/track-manage/page?page=${page}&pageSize=${pageSize}`);
+      const Data = await http.get<PageTrackPointData>(
+        `/track-manage/page?page=${page}&pageSize=${pageSize}`
+      );
       // 由于 http.ts 中已经处理了响应数据的解构，这里直接使用返回的 data
-      setTrackPoints(data);
+      const formattedItems = Data.items.map((item: PageTrackPoint) => ({
+        ...item,
+        createTime: dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss'),
+        updateTime: dayjs(item.updateTime).format('YYYY-MM-DD HH:mm:ss'),
+      }));
+
+      setTrackPoints({
+        ...Data,
+        items: formattedItems,
+      });
     } catch (error) {
       message.error('获取埋点列表失败');
     } finally {
       setLoading(false);
     }
   };
-
-  // 修改表格列定义
-  const columns = [
+  // 定义 updateTime 排序函数
+  const TimeSorter = (a: PageTrackPoint, b: PageTrackPoint) => {
+    return dayjs(a.updateTime).valueOf() - dayjs(b.updateTime).valueOf();
+  };
+  // 修改表格列定义，明确指定 columns 的类型
+  const columns: ColumnsType<PageTrackPoint> = [
     {
       title: '埋点名称',
       dataIndex: 'name',
@@ -78,9 +104,7 @@ const PageTrackPointManagePage = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status: boolean) => (
-        <span>{status ? '启用' : '禁用'}</span>
-      ),
+      render: (status: boolean) => <span>{status ? '启用' : '禁用'}</span>,
     },
     {
       title: 'PV',
@@ -91,21 +115,29 @@ const PageTrackPointManagePage = () => {
       title: '创建时间',
       dataIndex: 'createTime',
       key: 'createTime',
+      sorter: TimeSorter, // 添加排序函数
+      sortDirections: ['ascend', 'descend'], // 支持升序和降序排序
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
       key: 'updateTime',
+      sorter: TimeSorter, // 添加排序函数
+      sortDirections: ['ascend', 'descend'], // 支持升序和降序排序
     },
     {
       title: '操作',
       key: 'action',
       render: (_: any, record: PageTrackPoint) => (
         <Space>
-          <Button type="link" onClick={() => handleEdit(record)}>
+          <Button type="link" onClick={() => debouncedHandleEdit(record)}>
             编辑
           </Button>
-          <Button type="link" danger onClick={() => handleDelete(record.cid)}>
+          <Button
+            type="link"
+            danger
+            onClick={() => debouncedHandleDelete(record.cid)}
+          >
             删除
           </Button>
         </Space>
@@ -133,6 +165,38 @@ const PageTrackPointManagePage = () => {
     }
   };
 
+  type EditHandler = (record: PageTrackPoint) => void;
+  // 定义一个处理删除的函数类型
+  type DeleteHandler = (cid: string) => Promise<void>;
+  // 防抖函数
+
+  // 编辑函数的防抖函数
+  const debounceEdit = (fun: EditHandler, time: number) => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return function (this: any, record: PageTrackPoint) {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        fun.apply(this, [record]);
+        timer = null;
+      }, time);
+    };
+  };
+  // 删除函数的防抖函数
+  const debounceDelete = (fun: DeleteHandler, time: number) => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return async function (this: any, cid: string) {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(async () => {
+        await fun.apply(this, [cid]);
+        timer = null;
+      }, time);
+    };
+  };
+
   // 处理编辑
   const handleEdit = (record: PageTrackPoint) => {
     setEditingId(record.cid);
@@ -150,6 +214,10 @@ const PageTrackPointManagePage = () => {
       message.error('删除失败');
     }
   };
+  // 添加防抖的处理编辑函数
+  const debouncedHandleEdit = debounceEdit(handleEdit, 500);
+  // 添加防抖的处理删除函数
+  const debouncedHandleDelete = debounceDelete(handleDelete, 500);
 
   return (
     <div className="p-6">
@@ -166,9 +234,9 @@ const PageTrackPointManagePage = () => {
         </Button>
       </div>
 
-      <Table 
-        columns={columns} 
-        dataSource={trackPoints.items} 
+      <Table
+        columns={columns}
+        dataSource={trackPoints.items}
         rowKey="id"
         loading={loading}
         pagination={{

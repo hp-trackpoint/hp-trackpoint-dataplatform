@@ -1,8 +1,18 @@
-import { Button, Table, Modal, Form, Input, Space, message, Switch } from 'antd';
+import {
+  Button,
+  Table,
+  Modal,
+  Form,
+  Input,
+  Space,
+  message,
+  Switch,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import http from '../utils/http';
 import { PageTrackPoint } from './PageTrackPointManagePage';
-
+import dayjs from 'dayjs';
+import type { ColumnsType } from 'antd/es/table';
 interface ModuleTrackPointData {
   page: number;
   pageSize: number;
@@ -14,7 +24,6 @@ interface ModuleTrackPoint {
   id: number;
   bid: string;
   name: string;
-  path: string;
   description: string;
   status: boolean;
   createTime: string;
@@ -22,7 +31,7 @@ interface ModuleTrackPoint {
   _count: {
     trackPoints: number;
   };
-  page: PageTrackPoint
+  page: PageTrackPoint;
 }
 
 const PageModuleManagePage = () => {
@@ -30,7 +39,7 @@ const PageModuleManagePage = () => {
     page: 1,
     pageSize: 10,
     total: 0,
-    items: []
+    items: [],
   });
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -45,16 +54,30 @@ const PageModuleManagePage = () => {
   const fetchModules = async (page = 1, pageSize = 10) => {
     setLoading(true);
     try {
-      const data = await http.get<ModuleTrackPointData>(`/track-manage/module?page=${page}&pageSize=${pageSize}`);
-      setModules(data);
+      const Data = await http.get<ModuleTrackPointData>(
+        `/track-manage/module?page=${page}&pageSize=${pageSize}`
+      );
+      // 转换时间格式
+      const formattedItems = Data.items.map((item: ModuleTrackPoint) => ({
+        ...item,
+        createTime: dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss'),
+        updateTime: dayjs(item.updateTime).format('YYYY-MM-DD HH:mm:ss'),
+      }));
+
+      setModules({
+        ...Data,
+        items: formattedItems,
+      });
     } catch (error) {
       message.error('获取模块列表失败');
     } finally {
       setLoading(false);
     }
   };
-
-  const columns = [
+  const TimeSorter = (a: ModuleTrackPoint, b: ModuleTrackPoint) => {
+    return dayjs(a.updateTime).valueOf() - dayjs(b.updateTime).valueOf();
+  };
+  const columns: ColumnsType<ModuleTrackPoint> = [
     {
       title: '模块名称',
       dataIndex: 'name',
@@ -79,15 +102,13 @@ const PageModuleManagePage = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status: boolean) => (
-        <span>{status ? '启用' : '禁用'}</span>
-      ),
+      render: (status: boolean) => <span>{status ? '启用' : '禁用'}</span>,
     },
     {
-        title: '事件类型',
-        dataIndex: 'event',
-        key: 'trackPoints',
-      },
+      title: '事件类型',
+      dataIndex: 'event',
+      key: 'trackPoints',
+    },
     {
       title: 'MV/MC',
       dataIndex: ['_count', 'records'],
@@ -97,21 +118,29 @@ const PageModuleManagePage = () => {
       title: '创建时间',
       dataIndex: 'createTime',
       key: 'createTime',
+      sorter: TimeSorter, // 添加排序函数
+      sortDirections: ['ascend', 'descend'], // 支持升序和降序排序
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
       key: 'updateTime',
+      sorter: TimeSorter, // 添加排序函数
+      sortDirections: ['ascend', 'descend'], // 支持升序和降序排序
     },
     {
       title: '操作',
       key: 'action',
       render: (_: any, record: ModuleTrackPoint) => (
         <Space>
-          <Button type="link" onClick={() => handleEdit(record)}>
+          <Button type="link" onClick={() => debouncedHandleEdit(record)}>
             编辑
           </Button>
-          <Button type="link" danger onClick={() => handleDelete(record.bid)}>
+          <Button
+            type="link"
+            danger
+            onClick={() => debouncedHandleDelete(record.bid)}
+          >
             删除
           </Button>
         </Space>
@@ -156,6 +185,39 @@ const PageModuleManagePage = () => {
       message.error('删除失败');
     }
   };
+  type EditHandler = (record: ModuleTrackPoint) => void;
+  // 定义一个处理删除的函数类型
+  type DeleteHandler = (cid: string) => Promise<void>;
+  // 编辑函数的防抖函数
+  const debounceEdit = (fun: EditHandler, time: number) => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return function (this: any, record: ModuleTrackPoint) {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        fun.apply(this, [record]);
+        timer = null;
+      }, time);
+    };
+  };
+  // 删除函数的防抖函数
+  const debounceDelete = (fun: DeleteHandler, time: number) => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return async function (this: any, cid: string) {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(async () => {
+        await fun.apply(this, [cid]);
+        timer = null;
+      }, time);
+    };
+  };
+  // 添加防抖的处理编辑函数
+  const debouncedHandleEdit = debounceEdit(handleEdit, 500);
+  // 添加防抖的处理删除函数
+  const debouncedHandleDelete = debounceDelete(handleDelete, 500);
 
   return (
     <div className="p-6">
@@ -172,9 +234,9 @@ const PageModuleManagePage = () => {
         </Button>
       </div>
 
-      <Table 
-        columns={columns} 
-        dataSource={modules.items} 
+      <Table
+        columns={columns}
+        dataSource={modules.items}
         rowKey="id"
         loading={loading}
         pagination={{
