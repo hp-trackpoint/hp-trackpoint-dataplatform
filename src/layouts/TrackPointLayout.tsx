@@ -21,12 +21,12 @@ const items: MenuItem[] = [{
     label: '埋点管理',
 
     children: [
-      //模块
+      //页面
       {
         key: 'modulemanagement',
         label: <Link to="/manage/pagemanage">页面管理</Link>,
       },
-      //页面
+      //模块
       {
         key: 'pagemanagement',
         label: <Link to="/manage/modulemanage">模块管理</Link>,

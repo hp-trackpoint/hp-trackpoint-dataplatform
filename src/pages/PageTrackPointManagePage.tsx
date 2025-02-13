@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import http from '../utils/http';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
+import debounce from '../utils/debounce';
 
 interface PageTrackPointData {
   page: number;
@@ -170,42 +171,15 @@ const PageTrackPointManagePage = () => {
   type DeleteHandler = (cid: string) => Promise<void>;
   // 防抖函数
 
-  // 编辑函数的防抖函数
-  const debounceEdit = (fun: EditHandler, time: number) => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    return function (this: any, record: PageTrackPoint) {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        fun.apply(this, [record]);
-        timer = null;
-      }, time);
-    };
-  };
-  // 删除函数的防抖函数
-  const debounceDelete = (fun: DeleteHandler, time: number) => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    return async function (this: any, cid: string) {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(async () => {
-        await fun.apply(this, [cid]);
-        timer = null;
-      }, time);
-    };
-  };
-
   // 处理编辑
-  const handleEdit = (record: PageTrackPoint) => {
+  const handleEdit: EditHandler = (record: PageTrackPoint) => {
     setEditingId(record.cid);
     form.setFieldsValue(record);
     setIsModalVisible(true);
   };
 
   // 处理删除
-  const handleDelete = async (cid: string) => {
+  const handleDelete: DeleteHandler = async (cid: string) => {
     try {
       await http.delete(`/track-manage/page/${cid}`);
       message.success('删除成功');
@@ -215,9 +189,9 @@ const PageTrackPointManagePage = () => {
     }
   };
   // 添加防抖的处理编辑函数
-  const debouncedHandleEdit = debounceEdit(handleEdit, 500);
+  const debouncedHandleEdit = debounce(handleEdit, 500);
   // 添加防抖的处理删除函数
-  const debouncedHandleDelete = debounceDelete(handleDelete, 500);
+  const debouncedHandleDelete = debounce(handleDelete, 500);
 
   return (
     <div className="p-6">

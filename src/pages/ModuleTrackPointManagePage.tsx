@@ -13,6 +13,7 @@ import http from '../utils/http';
 import { PageTrackPoint } from './PageTrackPointManagePage';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
+import debounce from '../utils/debounce';
 interface ModuleTrackPointData {
   page: number;
   pageSize: number;
@@ -167,16 +168,18 @@ const PageModuleManagePage = () => {
       message.error('操作失败');
     }
   };
+  type EditHandler = (record: ModuleTrackPoint) => void;
 
+  type DeleteHandler = (cid: string) => Promise<void>;
   // 处理编辑
-  const handleEdit = (record: ModuleTrackPoint) => {
+  const handleEdit: EditHandler = (record: ModuleTrackPoint) => {
     setEditingId(record.bid);
     form.setFieldsValue(record);
     setIsModalVisible(true);
   };
 
   // 处理删除
-  const handleDelete = async (bid: string) => {
+  const handleDelete: DeleteHandler = async (bid: string) => {
     try {
       await http.delete(`/track-manage/module/${bid}`);
       message.success('删除成功');
@@ -185,39 +188,11 @@ const PageModuleManagePage = () => {
       message.error('删除失败');
     }
   };
-  type EditHandler = (record: ModuleTrackPoint) => void;
-  // 定义一个处理删除的函数类型
-  type DeleteHandler = (cid: string) => Promise<void>;
-  // 编辑函数的防抖函数
-  const debounceEdit = (fun: EditHandler, time: number) => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    return function (this: any, record: ModuleTrackPoint) {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        fun.apply(this, [record]);
-        timer = null;
-      }, time);
-    };
-  };
-  // 删除函数的防抖函数
-  const debounceDelete = (fun: DeleteHandler, time: number) => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    return async function (this: any, cid: string) {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(async () => {
-        await fun.apply(this, [cid]);
-        timer = null;
-      }, time);
-    };
-  };
+
   // 添加防抖的处理编辑函数
-  const debouncedHandleEdit = debounceEdit(handleEdit, 500);
+  const debouncedHandleEdit = debounce(handleEdit, 500);
   // 添加防抖的处理删除函数
-  const debouncedHandleDelete = debounceDelete(handleDelete, 500);
+  const debouncedHandleDelete = debounce(handleDelete, 500);
 
   return (
     <div className="p-6">

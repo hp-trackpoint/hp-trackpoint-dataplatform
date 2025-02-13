@@ -7,6 +7,7 @@ import logger from './logger';
 
 // 定义通用响应格式
 interface ResponseData<T = any> {
+  items: any;
   code: number;
   message: string;
   data: T;
