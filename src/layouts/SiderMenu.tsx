@@ -29,7 +29,7 @@ const items: MenuItem[] = [
   {
     key: 'visitoranalysis',
     icon: <UserOutlined />,
-    label: <Link to="visitoranalysis">访客分析</Link>,
+    label: '访客分析',
 
     children: [
       {
@@ -46,7 +46,7 @@ const items: MenuItem[] = [
   {
     key: 'visitanalysis',
     icon: <SlidersOutlined />,
-    label: <Link to="/visitanalysis">访问分析</Link>,
+    label: '访问分析',
 
     children: [
       {

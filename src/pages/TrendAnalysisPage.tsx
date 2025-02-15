@@ -1,22 +1,16 @@
-import type { RadioChangeEvent } from 'antd';
-import type { CheckboxGroupProps } from 'antd/es/checkbox';
-import { Radio, Layout, DatePicker, Card, Space, Table, Tag } from 'antd';
+import { Layout, Card, Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
-import useTrendStore from '../stores/trendStore';
-import {
-  timeToday,
-  timeSeven,
-  timeThirty,
-  timeYesterday,
-  visitorAll,
-  visitorNew,
-  visitorOld,
-} from '../stores/trendStore';
+import useHeaderState from '../stores/headerStore';
 import * as echarts from 'echarts';
+import {
+  TimeSelector,
+  VisitorSelector,
+  SourceSelector,
+  DeviceSelector,
+} from '../layouts/SelectHeader';
 
-const { RangePicker } = DatePicker;
 const { Content } = Layout;
 interface DataType {
   data: string;
@@ -65,7 +59,7 @@ export default function TrendAnalysisPage() {
     if (chartRef.current) {
       // 初始化 ECharts 实例
       const myChart = echarts.init(chartRef.current);
-      console.log('chartRef.current:', chartRef.current);
+
       // 配置 ECharts 选项
       const option = {
         tooltip: {
@@ -108,7 +102,7 @@ export default function TrendAnalysisPage() {
           },
         ],
       };
-      console.log('ECharts option:', option);
+
       // 设置 ECharts 选项
       myChart.setOption(option);
 
@@ -126,34 +120,17 @@ export default function TrendAnalysisPage() {
   }
 
   //时间选择和用户选择的状态管理
+  const {
+    onChangeTime,
+    onChangeVisitor,
+    onChangeDevice,
+    onChangeSource,
+    timeState,
+    visitorState,
+    deviceState,
+    sourceState,
+  } = useHeaderState();
 
-  const time = useTrendStore((state) => state.timeState);
-  const visitor = useTrendStore((state) => state.visitorState);
-  const onChangeTime = (e: RadioChangeEvent) => {
-    if (e.target.value === 'today') {
-      timeToday();
-    }
-    if (e.target.value === 'yesterday') {
-      timeYesterday();
-    }
-    if (e.target.value === 'seven') {
-      timeSeven();
-    }
-    if (e.target.value === 'thirty') {
-      timeThirty();
-    }
-  };
-  const onChangeVisitor = (e: RadioChangeEvent) => {
-    if (e.target.value === 'all') {
-      visitorAll();
-    }
-    if (e.target.value === 'new') {
-      visitorNew();
-    }
-    if (e.target.value === 'old') {
-      visitorOld();
-    }
-  };
   //请求数据
   const [data, setData] = useState<ApiResponse | null>(null);
   // 定义加载状态
@@ -184,7 +161,7 @@ export default function TrendAnalysisPage() {
     };
 
     fetchData();
-  }, [time, visitor]);
+  }, []);
   if (loading) {
     return <p>Loading... </p>;
   }
@@ -192,12 +169,7 @@ export default function TrendAnalysisPage() {
   /*  if (error) {
     return <p>Error: {error}</p>;
   } */
-  const options: CheckboxGroupProps<string>['options'] = [
-    { label: '按时', value: 'Hour' },
-    { label: '按日', value: 'Day' },
-    { label: '按周', value: 'Week' },
-    { label: '按月', value: 'Month' },
-  ];
+
   const columns: TableProps<DataType>['columns'] = [
     {
       title: '日期',
@@ -472,71 +444,24 @@ export default function TrendAnalysisPage() {
           flexWrap: 'wrap',
         }}
       >
-        <div
-          style={{
-            marginRight: 20,
-            marginLeft: 5,
-          }}
-        >
-          <span>时间：</span>
-          <Radio.Group
-            onChange={onChangeTime}
-            value={time}
-            options={[
-              {
-                value: 'today',
-                label: <p>今日</p>,
-              },
-              {
-                value: 'yesterday',
-                label: <p>昨日</p>,
-              },
-              {
-                value: 'seven',
-                label: <p>近7天</p>,
-              },
-              {
-                value: 'thirty',
-                label: <p>近30天</p>,
-              },
-            ]}
-          />
-        </div>
-        <RangePicker picker="month" style={{ marginRight: 40 }} />
-        <Radio.Group
-          block
-          options={options}
-          defaultValue="Apple"
-          optionType="button"
-          buttonStyle="solid"
-        />
+        <TimeSelector
+          time={timeState}
+          onChangeTime={onChangeTime}
+        ></TimeSelector>
+
+        <VisitorSelector
+          visitor={visitorState}
+          onChangeVisitor={onChangeVisitor}
+        ></VisitorSelector>
         <div style={{ width: '100%' }} />
-        <div
-          style={{
-            marginRight: 20,
-            marginLeft: 5,
-          }}
-        >
-          <span>访客：</span>
-          <Radio.Group
-            onChange={onChangeVisitor}
-            value={visitor}
-            options={[
-              {
-                value: 'all',
-                label: <p>全部</p>,
-              },
-              {
-                value: 'new',
-                label: <p>新访客</p>,
-              },
-              {
-                value: 'old',
-                label: <p>老访客</p>,
-              },
-            ]}
-          />
-        </div>
+        <DeviceSelector
+          device={deviceState}
+          onChangeDevice={onChangeDevice}
+        ></DeviceSelector>
+        <SourceSelector
+          source={sourceState}
+          onChangeSource={onChangeSource}
+        ></SourceSelector>
       </div>
 
       {/* 内容区域 */}
@@ -548,7 +473,10 @@ export default function TrendAnalysisPage() {
               <h2>流量概览</h2>
               <Table
                 columns={columns}
-                dataSource={TableData}
+                dataSource={TableData.map((item) => ({
+                  ...item,
+                  key: item.data,
+                }))}
                 pagination={false}
               />
             </Card>
