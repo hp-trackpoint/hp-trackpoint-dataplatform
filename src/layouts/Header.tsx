@@ -1,19 +1,75 @@
-import React, { useState } from 'react';
-import { Layout, Dropdown, Avatar, Space, Typography } from 'antd';
+import { useEffect, useState } from 'react';
+import { Layout, Dropdown, Avatar, Space, Typography, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import {
   UserOutlined,
   SettingOutlined,
   LogoutOutlined,
   DownOutlined,
+  AreaChartOutlined,
 } from '@ant-design/icons';
 
 import type { MenuProps } from 'antd';
 
 const { Header } = Layout;
 
+type MenuItem = Required<MenuProps>['items'][number];
+const menuItems: MenuItem[] = [
+  {
+    label: <Link to="/">数据</Link>,
+    key: 'app',
+    icon: <AreaChartOutlined />,
+  },
+  {
+    label: <Link to="/manage">埋点管理</Link>,
+    key: 'mail',
+    icon: <UserOutlined />,
+  },
+];
+
+const items: MenuProps['items'] = [
+  {
+    key: 'profile',
+    label: (
+      <Link to="/profile">
+        <Space>
+          <UserOutlined /> 个人信息
+        </Space>
+      </Link>
+    ),
+  },
+  {
+    key: 'settings',
+    label: (
+      <Link to="/settings">
+        <Space>
+          <SettingOutlined /> 设置
+        </Space>
+      </Link>
+    ),
+  },
+  {
+    type: 'divider',
+  },
+  {
+    key: 'logout',
+    label: (
+      <Link to="/logout">
+        <Space>
+          <LogoutOutlined /> 退出登录
+        </Space>
+      </Link>
+    ),
+  },
+];
+
 export default function AppHeader() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [current, setCurrent] = useState('mail'); // 默认选中“埋点管理”
+
+  const onClick: MenuProps['onClick'] = (e) => {
+    setCurrent(e.key);
+  };
 
   // 格式化日期（仅显示年月日）
   const formattedTime = currentTime.toLocaleString('zh-CN', {
@@ -22,41 +78,15 @@ export default function AppHeader() {
     day: '2-digit',
   });
 
-  const items: MenuProps['items'] = [
-    {
-      key: 'profile',
-      label: (
-        <Link to="/profile">
-          <Space>
-            <UserOutlined /> 个人信息
-          </Space>
-        </Link>
-      ),
-    },
-    {
-      key: 'settings',
-      label: (
-        <Link to="/settings">
-          <Space>
-            <SettingOutlined /> 设置
-          </Space>
-        </Link>
-      ),
-    },
-    {
-      type: 'divider',
-    },
-    {
-      key: 'logout',
-      label: (
-        <Link to="/logout">
-          <Space>
-            <LogoutOutlined /> 退出登录
-          </Space>
-        </Link>
-      ),
-    },
-  ];
+  useEffect(() => {
+    // 获取当前的路径并根据路径设置菜单项的状态
+    const path = window.location.pathname;
+    if (path === '/') {
+      setCurrent('app');
+    } else if (path === '/manage') {
+      setCurrent('mail');
+    }
+  }, [window.location.pathname]); // 路由变化时更新选中项
 
   return (
     <Header
@@ -78,10 +108,22 @@ export default function AppHeader() {
       <div>
         {/* Logo：点击跳转到主页 */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/src/img/icon.png" alt="Logo" style={{ height: '60px' }} />
+          <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
+            <img
+              src="/src/img/icon.png"
+              alt="Logo"
+              style={{ height: '60px', marginRight: '20px' }}
+            />
+          </Link>
+          <Menu
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode="horizontal"
+            items={menuItems}
+          />
         </div>
       </div>
-
+      {/* 埋点管理 */}
       {/* 右侧：日期显示和头像下拉菜单 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         {/* 日期显示 */}
