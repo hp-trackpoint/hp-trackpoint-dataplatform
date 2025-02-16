@@ -2,7 +2,7 @@ import { Layout, Card, Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
-import useHeaderState from '../stores/headerStore';
+import createHeaderState from '../stores/headerStore';
 import * as echarts from 'echarts';
 import {
   TimeSelector,
@@ -27,6 +27,8 @@ interface ChartData {
   pageviews: number;
   visits: number;
 }
+const useHeaderState = createHeaderState();
+
 export default function TrendAnalysisPage() {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartData: ChartData[] = [
@@ -121,14 +123,14 @@ export default function TrendAnalysisPage() {
 
   //时间选择和用户选择的状态管理
   const {
-    onChangeTime,
-    onChangeVisitor,
-    onChangeDevice,
-    onChangeSource,
     timeState,
     visitorState,
     deviceState,
     sourceState,
+    onChangeTime,
+    onChangeVisitor,
+    onChangeDevice,
+    onChangeSource,
   } = useHeaderState();
 
   //请求数据
