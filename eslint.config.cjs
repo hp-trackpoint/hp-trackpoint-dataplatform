@@ -1,20 +1,20 @@
 // eslint.config.cjs
-const js = require("@eslint/js");
-const globals = require("globals");
-const reactPlugin = require("eslint-plugin-react");
-const reactHooksPlugin = require("eslint-plugin-react-hooks");
-const reactRefreshPlugin = require("eslint-plugin-react-refresh");
-const tsParser = require("@typescript-eslint/parser");
-const tsPlugin = require("@typescript-eslint/eslint-plugin");
-const prettierPlugin = require("eslint-plugin-prettier");
+const js = require('@eslint/js');
+const globals = require('globals');
+const reactPlugin = require('eslint-plugin-react');
+const reactHooksPlugin = require('eslint-plugin-react-hooks');
+const reactRefreshPlugin = require('eslint-plugin-react-refresh');
+const tsParser = require('@typescript-eslint/parser');
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const prettierPlugin = require('eslint-plugin-prettier');
 
 module.exports = [
   js.configs.recommended,
   {
-    files: ["**/*.{js,jsx,ts,tsx}"], // 匹配所有 JS、JSX、TS 和 TSX 文件
+    files: ['**/*.{js,jsx,ts,tsx}'], // 匹配所有 JS、JSX、TS 和 TSX 文件
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -28,26 +28,27 @@ module.exports = [
     },
     plugins: {
       react: reactPlugin,
-      "react-hooks": reactHooksPlugin,
-      "react-refresh": reactRefreshPlugin,
-      "@typescript-eslint": tsPlugin,
+      'react-hooks': reactHooksPlugin,
+      'react-refresh': reactRefreshPlugin,
+      '@typescript-eslint': tsPlugin,
       prettier: prettierPlugin,
     },
     settings: {
       react: {
-        version: "detect",
+        version: 'detect',
       },
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
       ...reactHooksPlugin.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
-      "react-refresh/only-export-components": "warn",
-      "no-console": "warn",
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-no-target-blank": "warn",
+      'react-refresh/only-export-components': 'warn',
+      'no-console': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-no-target-blank': 'warn',
     },
   },
 ];

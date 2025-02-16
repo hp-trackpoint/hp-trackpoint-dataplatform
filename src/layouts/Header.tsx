@@ -65,7 +65,9 @@ const items: MenuProps['items'] = [
 
 export default function AppHeader() {
   const [currentTime, setCurrentTime] = useState(new Date());
+
   const [current, setCurrent] = useState('mail'); // 默认选中“埋点管理”
+
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key);
@@ -77,7 +79,6 @@ export default function AppHeader() {
     month: '2-digit',
     day: '2-digit',
   });
-
   useEffect(() => {
     // 获取当前的路径并根据路径设置菜单项的状态
     const path = window.location.pathname;
@@ -87,7 +88,6 @@ export default function AppHeader() {
       setCurrent('mail');
     }
   }, [window.location.pathname]); // 路由变化时更新选中项
-
   return (
     <Header
       style={{

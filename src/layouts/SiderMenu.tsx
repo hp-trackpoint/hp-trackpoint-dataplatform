@@ -6,9 +6,7 @@ import {
   LineChartOutlined,
   UserOutlined,
   SlidersOutlined,
-  TeamOutlined,
   FundViewOutlined,
-  ProfileOutlined,
   ReconciliationOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -24,25 +22,6 @@ const items: MenuItem[] = [
     label: <Link to="/">数据总览</Link>,
   },
   {
-    //埋点管理
-    key: 'datamanagement',
-    icon: <ProfileOutlined />,
-    label: '埋点管理',
-
-    children: [
-      //模块
-      {
-        key: 'modulemanagement',
-        label: <Link to="/modulemanagement">模块管理</Link>,
-      },
-      //页面
-      {
-        key: 'pagemanagement',
-        label: <Link to="/pagemanagement">页面管理</Link>,
-      },
-    ],
-  },
-  {
     key: 'trendanalysis',
     icon: <LineChartOutlined />,
     label: <Link to="/trendanalysis">趋势分析</Link>,
@@ -50,7 +29,7 @@ const items: MenuItem[] = [
   {
     key: 'visitoranalysis',
     icon: <UserOutlined />,
-    label: '访客分析',
+    label: <Link to="visitoranalysis">访客分析</Link>,
 
     children: [
       {
@@ -67,7 +46,7 @@ const items: MenuItem[] = [
   {
     key: 'visitanalysis',
     icon: <SlidersOutlined />,
-    label: '访问分析',
+    label: <Link to="/visitanalysis">访问分析</Link>,
 
     children: [
       {
