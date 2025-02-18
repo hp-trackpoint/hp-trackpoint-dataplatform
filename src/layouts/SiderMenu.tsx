@@ -33,13 +33,13 @@ const items: MenuItem[] = [
 
     children: [
       {
-        key: 'regionanalysis',
-        label: <Link to="/regionanalysis">地域分析</Link>,
+        key: 'regionalanalysis',
+        label: <Link to="visitoranalysis/regionalanalysis">地域分析</Link>,
       },
       {
         //设备分析
         key: 'deviceanalysis',
-        label: <Link to="/deviceanalysis">设备分析</Link>,
+        label: <Link to="visitoranalysis/deviceanalysis">设备分析</Link>,
       },
     ],
   },
