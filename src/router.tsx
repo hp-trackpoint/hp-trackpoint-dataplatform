@@ -11,7 +11,7 @@ import TrackPointLayout from './layouts/TrackPointLayout';
 import PageTrackPointManagePage from './pages/PageTrackPointManagePage';
 import ModuleTrackPointManagePage from './pages/ModuleTrackPointManagePage';
 import RegionalAnalysisPage from './pages/RegionalAnalysis';
-
+import DeviceAnalysisPage from './pages/DeviceAnalysis';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'regionalanalysis', element: <RegionalAnalysisPage /> },
 
-          { path: 'deviceanalysis', element: <NotFoundPage /> },
+          { path: 'deviceanalysis', element: <DeviceAnalysisPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },
