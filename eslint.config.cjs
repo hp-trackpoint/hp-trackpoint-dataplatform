@@ -43,7 +43,7 @@ module.exports = [
       ...reactHooksPlugin.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
       'react-refresh/only-export-components': 'warn',
-      'no-console': 'warn',
+      'no-console': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

@@ -6,12 +6,12 @@ import EventAnalysisPage from './pages/EventAnalysisPage';
 import TrendAnalysisPage from './pages/TrendAnalysisPage';
 import UserAnalysisPage from './pages/UserAnalysisPage';
 import VisitAnalysisPage from './pages/VisitAnalysisPage';
-import VisitorAnalysisPage from './pages/VisitorAnalysisPage';
 import NotFoundPage from './pages/NotFound';
 import TrackPointLayout from './layouts/TrackPointLayout';
 import PageTrackPointManagePage from './pages/PageTrackPointManagePage';
 import ModuleTrackPointManagePage from './pages/ModuleTrackPointManagePage';
-
+import RegionalAnalysisPage from './pages/RegionalAnalysis';
+import DeviceAnalysisPage from './pages/DeviceAnalysis';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -23,7 +23,14 @@ export const router = createBrowserRouter([
       { path: 'trendanalysis', element: <TrendAnalysisPage /> },
       { path: 'useranalysis', element: <UserAnalysisPage /> },
       { path: 'visitanalysis', element: <VisitAnalysisPage /> },
-      { path: 'visitoranalysis', element: <VisitorAnalysisPage /> },
+      {
+        path: 'visitoranalysis',
+        children: [
+          { path: 'regionalanalysis', element: <RegionalAnalysisPage /> },
+
+          { path: 'deviceanalysis', element: <DeviceAnalysisPage /> },
+        ],
+      },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
@@ -34,5 +41,5 @@ export const router = createBrowserRouter([
       { path: 'pagemanage', element: <PageTrackPointManagePage /> },
       { path: 'modulemanage', element: <ModuleTrackPointManagePage /> },
     ],
-  }
+  },
 ]);
