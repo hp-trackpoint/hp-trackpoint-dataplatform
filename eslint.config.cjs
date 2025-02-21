@@ -49,6 +49,7 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/jsx-no-target-blank': 'warn',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 ];
