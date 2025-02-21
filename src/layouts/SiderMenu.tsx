@@ -37,9 +37,9 @@ const items: MenuItem[] = [
         label: <Link to="visitoranalysis/regionalanalysis">地域分析</Link>,
       },
       {
-        //设备分析
+        //新老访客
         key: 'deviceanalysis',
-        label: <Link to="visitoranalysis/deviceanalysis">设备分析</Link>,
+        label: <Link to="visitoranalysis/useranalysis">新老访客</Link>,
       },
     ],
   },

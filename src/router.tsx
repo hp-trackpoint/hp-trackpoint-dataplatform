@@ -5,13 +5,11 @@ import AppCrashAnalysisPage from './pages/AppCrashAnalysisPage';
 import EventAnalysisPage from './pages/EventAnalysisPage';
 import TrendAnalysisPage from './pages/TrendAnalysisPage';
 import UserAnalysisPage from './pages/UserAnalysisPage';
-import VisitAnalysisPage from './pages/VisitAnalysisPage';
 import NotFoundPage from './pages/NotFound';
 import TrackPointLayout from './layouts/TrackPointLayout';
 import PageTrackPointManagePage from './pages/PageTrackPointManagePage';
 import ModuleTrackPointManagePage from './pages/ModuleTrackPointManagePage';
 import RegionalAnalysisPage from './pages/RegionalAnalysis';
-import DeviceAnalysisPage from './pages/DeviceAnalysis';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -22,13 +20,13 @@ export const router = createBrowserRouter([
       { path: 'eventanalysis', element: <EventAnalysisPage /> },
       { path: 'trendanalysis', element: <TrendAnalysisPage /> },
       { path: 'useranalysis', element: <UserAnalysisPage /> },
-      { path: 'visitanalysis', element: <VisitAnalysisPage /> },
+      { path: 'visitanalysis', element: <NotFoundPage /> },
       {
         path: 'visitoranalysis',
         children: [
           { path: 'regionalanalysis', element: <RegionalAnalysisPage /> },
 
-          { path: 'deviceanalysis', element: <DeviceAnalysisPage /> },
+          { path: 'useranalysis', element: <UserAnalysisPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },

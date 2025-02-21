@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '-':
-        specifier: ^0.0.1
-        version: 0.0.1
       '@ant-design/icons':
         specifier: ^5.6.0
         version: 5.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -107,9 +104,6 @@ importers:
         version: 1.8.1(eslint@9.18.0(jiti@2.4.2))(vite@6.0.11(@types/node@22.13.1)(jiti@2.4.2)(yaml@2.7.0))
 
 packages:
-
-  '-@0.0.1':
-    resolution: {integrity: sha512-3HfneK3DGAm05fpyj20sT3apkNcvPpCuccOThOPdzz8sY7GgQGe0l93XH9bt+YzibcTIgUAIMoyVJI740RtgyQ==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -2898,8 +2892,6 @@ packages:
         optional: true
 
 snapshots:
-
-  '-@0.0.1': {}
 
   '@ampproject/remapping@2.3.0':
     dependencies:
