@@ -11,31 +11,62 @@ interface CardItem {
   description?: string;
 }
 
+interface TrackStatsResponse {
+  pageInfo: {
+    cid: string;
+    totalPV: number;
+    totalUV: number;
+  };
+  environmentStats: Array<{
+    environment: string;
+    pv: number;
+    firstVisit: string;
+    lastVisit: string;
+  }>;
+  deviceStats: Array<{
+    deviceInfo: {
+      os: string;
+      region: string;
+      browser: string;
+      osVersion: string;
+      deviceType: string;
+      browserVersion: string;
+    };
+    count: number;
+  }>;
+  moduleStats: {
+    totalClicks: number;
+    modules: Array<{
+      _count: {
+        id: number;
+      };
+      moduleId: number;
+    }>;
+  };
+}
+
 const DEBOUNCE_DELAY = 300; // 防抖延迟时间（毫秒）
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<CardItem[]>([]);
-
+  const [statsData, setStatsData] = useState<TrackStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<[string, string] | null>(null);
+
   const debounceTimer = useRef<number | null>(null);
 
-  // 防抖处理日期变化
-  const onChange: DatePickerProps['onChange'] = (date) => {
-    // 清除之前的定时器
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
+  // Replace DatePicker with RangePicker
+  const { RangePicker } = DatePicker;
 
-    // 设置新的定时器
-    debounceTimer.current = window.setTimeout(() => {
-      if (date) {
-        const formattedDate = dayjs(date).format('YYYY-MM-DD');
-        setSelectedDate(formattedDate);
-      } else {
-        setSelectedDate(null);
-      }
-    }, DEBOUNCE_DELAY);
+  const onChange = (dates: any) => {
+    if (dates) {
+      const [start, end] = dates;
+      const startTime = dayjs(start).format('YYYY-MM-DDTHH:mm:ss[Z]');
+      const endTime = dayjs(end).format('YYYY-MM-DDTHH:mm:ss[Z]');
+      setDateRange([startTime, endTime]);
+    } else {
+      setDateRange(null);
+    }
   };
 
   // 组件卸载时清除定时器
@@ -51,35 +82,16 @@ const HomePage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        let url = 'http://62.234.16.19/track-stats/page?cid=home_page';
+        
+        if (dateRange) {
+          const [startTime, endTime] = dateRange;
+          url += `&startTime=${startTime}&endTime=${endTime}`;
+        }
 
-        // 模拟请求（替换为实际接口调用）
-        const mockData = [
-          {
-            id: 1,
-            title: 'Example 1',
-            createdAt: '2025-01-31',
-            description: 'Data for 2023-01-31',
-          },
-          {
-            id: 2,
-            title: 'Example 2',
-            createdAt: '2025-02-01',
-            description: 'Data for 2025-02-01',
-          },
-          {
-            id: 3,
-            title: 'Example 3',
-            createdAt: '2025-02-02',
-            description: 'Data for 2023-02-02',
-          },
-        ];
-
-        // 根据日期过滤
-        const filteredData = selectedDate
-          ? mockData.filter((item) => item.createdAt === selectedDate)
-          : mockData;
-
-        setData(filteredData);
+        const response = await fetch(url);
+        const data = await response.json();
+        setStatsData(data.data);
       } catch (err) {
         console.error('数据加载失败:', err);
       } finally {
@@ -88,29 +100,71 @@ const HomePage: React.FC = () => {
     };
 
     fetchData();
-  }, [selectedDate]);
+  }, [dateRange]);
 
   return (
     <div>
-      <DatePicker onChange={onChange} needConfirm />
+      <RangePicker onChange={onChange} needConfirm />
       <div style={{ padding: 24 }}>
         {loading ? (
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : (
           <Row gutter={[16, 16]}>
-            {data.map((item) => (
-              <Col key={item.id} xs={24} sm={12} md={12} lg={12} xl={12}>
-                <Card
-                  title={item.title}
-                  bordered={false}
-                  hoverable
-                  style={{ height: 200 }}
-                >
-                  <p>{item.description || 'No description available'}</p>
-                  <p>创建时间：{item.createdAt || 'Unknown'}</p>
-                </Card>
-              </Col>
-            ))}
+            {/* Page Info Card */}
+            <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+              <Card title="Page Information" bordered={false} hoverable>
+                <p>Total PV: {statsData?.pageInfo.totalPV}</p>
+                <p>Total UV: {statsData?.pageInfo.totalUV}</p>
+                <p>CID: {statsData?.pageInfo.cid}</p>
+              </Card>
+            </Col>
+
+            {/* Environment Stats Card */}
+            <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+              <Card title="Environment Statistics" bordered={false} hoverable>
+                {statsData?.environmentStats.map((env, index) => (
+                  <div key={index}>
+                    <p>Environment: {env.environment}</p>
+                    <p>PV: {env.pv}</p>
+                    <p>First Visit: {dayjs(env.firstVisit).format('YYYY-MM-DD HH:mm:ss')}</p>
+                    <p>Last Visit: {dayjs(env.lastVisit).format('YYYY-MM-DD HH:mm:ss')}</p>
+                  </div>
+                ))}
+              </Card>
+            </Col>
+
+            {/* Device Stats Card */}
+            <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+              <Card title="Device Statistics" bordered={false} hoverable>
+                {statsData?.deviceStats.map((device, index) => (
+                  <div key={index}>
+                    <p>OS: {device.deviceInfo.os} {device.deviceInfo.osVersion}</p>
+                    <p>Browser: {device.deviceInfo.browser} {device.deviceInfo.browserVersion}</p>
+                    <p>Device Type: {device.deviceInfo.deviceType}</p>
+                    <p>Region: {device.deviceInfo.region}</p>
+                    <p>Count: {device.count}</p>
+                  </div>
+                ))}
+              </Card>
+            </Col>
+
+            {/* Module Stats Card */}
+            <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+              <Card title="Module Statistics" bordered={false} hoverable>
+                <p>Total Clicks: {statsData?.moduleStats.totalClicks}</p>
+                {statsData?.moduleStats.modules.map((module, index) => (
+                  <div key={index}>
+                    <p>Module ID: {module.moduleId}</p>
+                    <p>Click Count: {module._count.id}</p>
+                  </div>
+                ))}
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+              <Card title="Module Statistics" bordered={false} hoverable>
+               
+              </Card>
+            </Col>
           </Row>
         )}
       </div>
