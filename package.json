@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.0",
+    "@types/echarts": "^5.0.0",
     "antd": "^5.23.2",
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",

@@ -11,6 +11,9 @@ importers:
       '@ant-design/icons':
         specifier: ^5.6.0
         version: 5.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/echarts':
+        specifier: ^5.0.0
+        version: 5.0.0
       antd:
         specifier: ^5.23.2
         version: 5.23.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -719,6 +722,10 @@ packages:
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
+
+  '@types/echarts@5.0.0':
+    resolution: {integrity: sha512-5uc/16BlYpzH8kU/u8aeRRgY2FV6yRY7RjPnYfUFPowl0F3kvNgfaz09PmeVdLkqdAtMft3XkCfqiJPJjG2DNQ==}
+    deprecated: This is a stub types definition. echarts provides its own type definitions, so you do not need this installed.
 
   '@types/eslint@8.56.12':
     resolution: {integrity: sha512-03ruubjWyOHlmljCVoxSuNDdmfZDzsrrz0P2LeJsOXr+ZwFQ+0yQIwNCwt/GYhV7Z31fgtXJTAEs+FYlEL851g==}
@@ -3501,6 +3508,10 @@ snapshots:
       '@types/node': 22.13.1
 
   '@types/cookie@0.6.0': {}
+
+  '@types/echarts@5.0.0':
+    dependencies:
+      echarts: 5.6.0
 
   '@types/eslint@8.56.12':
     dependencies:
