@@ -87,9 +87,9 @@ const EchartsMapComponent = () => {
             map: 'customMap',
             label: {
               show: false, // 默认不显示地区名称
-              emphasis: {
-                show: true, // 鼠标悬停时显示地区名称
-              },
+            },
+            emphasis: {
+              show: true, // 鼠标悬停时显示地区名称
             },
             data: regionData,
           },

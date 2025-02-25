@@ -324,7 +324,7 @@ const expandable = {
       />
     );
   },
-  expandIconColumnIndex: 0,
+  // expandIconColumnIndex: 0 暂时不需要expand，且这个被废除
 };
 
 export default function EventAnalysisPage() {
