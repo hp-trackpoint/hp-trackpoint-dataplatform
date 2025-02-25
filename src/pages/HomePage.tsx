@@ -1,22 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { DatePickerProps } from 'antd';
-import {
-  DatePicker,
-  Row,
-  Col,
-  Card,
-  Skeleton,
-  Statistic,
-  Progress,
-  Table,
-  Button,
-  Space,
-} from 'antd';
+import { DatePicker, Row, Col, Card, Layout, Table } from 'antd';
 import dayjs from 'dayjs';
 import EchartsMapComponent from '../utils/data';
 import * as echarts from 'echarts';
-import { UserOutlined, EyeOutlined, CalendarOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import {
+  TimeSelector,
+  VisitorSelector,
+  SourceSelector,
+  DeviceSelector,
+} from '../layouts/SelectHeader';
+import createHeaderState from '../stores/headerStore';
+import type { ColumnsType } from 'antd/es/table';
 
 interface CardItem {
   id: number;
@@ -71,7 +65,21 @@ interface RegionData {
   value: number;
 }
 
+interface DataType {
+  data: string;
+  Pageviews: number;
+  Visits: number;
+  UniqueVisitors: number;
+  IPNumbers: number;
+  AveragePageviewsPerVisit: number;
+  AverageVisitDuration: string;
+  BounceRate: string;
+}
+
+const useHeaderState = createHeaderState();
 const DEBOUNCE_DELAY = 300; // 防抖延迟时间（毫秒）
+
+const { Content } = Layout;
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<CardItem[]>([]);
@@ -83,11 +91,20 @@ const HomePage: React.FC = () => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   );
-  const envChartRef = useRef<HTMLDivElement>(null);
-  const deviceChartRef = useRef<HTMLDivElement>(null);
-  const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
-  const [trendData, setTrendData] = useState<ChartData[]>([
+
+  //时间选择和用户选择的状态管理
+  const {
+    timeState,
+    visitorState,
+    deviceState,
+    sourceState,
+    onChangeTime,
+    onChangeVisitor,
+    onChangeDevice,
+    onChangeSource,
+  } = useHeaderState();
+
+  const chartData: ChartData[] = [
     { time: '00时', pageviews: 1020, visits: 200 },
     { time: '01时', pageviews: 350, visits: 100 },
     { time: '02时', pageviews: 50, visits: 30 },
@@ -112,7 +129,65 @@ const HomePage: React.FC = () => {
     { time: '21时', pageviews: 1580, visits: 900 },
     { time: '22时', pageviews: 700, visits: 700 },
     { time: '23时', pageviews: 0, visits: 100 },
-  ]);
+  ];
+
+  useEffect(() => {
+    if (chartRef.current) {
+      // 初始化 ECharts 实例
+      const myChart = echarts.init(chartRef.current);
+
+      // 配置 ECharts 选项
+      const option = {
+        tooltip: {
+          trigger: 'axis',
+        },
+        legend: {
+          data: ['浏览量', '访问次数'],
+        },
+        xAxis: {
+          type: 'category',
+          data: chartData.map((item) => item.time),
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            name: '浏览量',
+            type: 'line',
+            data: chartData.map((item) => item.pageviews),
+            symbol: 'circle',
+            itemStyle: {
+              color: '#1890ff',
+            },
+            lineStyle: {
+              color: '#1890ff',
+            },
+          },
+          {
+            name: '访问次数',
+            type: 'line',
+            data: chartData.map((item) => item.visits),
+            symbol: 'circle',
+            itemStyle: {
+              color: '#fadb14',
+            },
+            lineStyle: {
+              color: '#fadb14',
+            },
+          },
+        ],
+      };
+
+      // 设置 ECharts 选项
+      myChart.setOption(option);
+
+      // 组件卸载时销毁 ECharts 实例
+      return () => {
+        myChart.dispose();
+      };
+    }
+  }, []);
 
   const debounceTimer = useRef<number | null>(null);
 
@@ -139,38 +214,84 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
+  // 获取时间范围
+  const getTimeRange = (timeValue: string) => {
+    const now = dayjs();
+    let startTime, endTime;
+
+    switch (timeValue) {
+      case 'today':
+        startTime = now.startOf('day');
+        endTime = now.endOf('day');
+        break;
+      case 'yesterday':
+        startTime = now.subtract(1, 'day').startOf('day');
+        endTime = now.subtract(1, 'day').endOf('day');
+        break;
+      case 'seven':
+        startTime = now.subtract(6, 'day').startOf('day');
+        endTime = now.endOf('day');
+        break;
+      case 'thirty':
+        startTime = now.subtract(29, 'day').startOf('day');
+        endTime = now.endOf('day');
+        break;
+      default:
+        startTime = now.startOf('day');
+        endTime = now.endOf('day');
+    }
+
+    return {
+      startTime: startTime.format('YYYY-MM-DD HH:mm:ss'),
+      endTime: endTime.format('YYYY-MM-DD HH:mm:ss'),
+    };
+  };
+
+  // 获取数据的 useEffect
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        let url = 'http://62.234.16.19/track-stats/page?cid=home_page';
+        const timeRange = getTimeRange(timeState);
 
-        if (dateRange) {
-          const [startTime, endTime] = dateRange;
-          url += `&startTime=${startTime}&endTime=${endTime}`;
-        }
+        // 构建 URL 和参数
+        const params = new URLSearchParams({
+          cid: 'home_page',
+          startTime: timeRange.startTime,
+          endTime: timeRange.endTime,
+          visitor: visitorState,
+          device: deviceState,
+          source: sourceState,
+        });
+
+        const url = `http://62.234.16.19/track-stats/page?${params.toString()}`;
 
         const response = await fetch(url);
         const data = await response.json();
-        setStatsData(data.data);
 
-        // 处理地区数据
-        const regionStats = data.data.deviceStats.reduce(
-          (acc: Record<string, number>, curr: any) => {
-            const region = curr.deviceInfo.region;
-            acc[region] = (acc[region] || 0) + curr.count;
-            return acc;
-          },
-          {}
-        );
+        if (data.code === 200) {
+          setStatsData(data.data);
 
-        const formattedRegionData = Object.entries(regionStats).map(
-          ([name, value]) => ({
-            name,
-            value,
-          })
-        );
-        setRegionData(formattedRegionData);
+          // 处理地区数据
+          const regionStats = data.data.deviceStats.reduce(
+            (acc: Record<string, number>, curr: any) => {
+              const region = curr.deviceInfo.region;
+              acc[region] = (acc[region] || 0) + curr.count;
+              return acc;
+            },
+            {}
+          );
+
+          const formattedRegionData = Object.entries(regionStats).map(
+            ([name, value]) => ({
+              name,
+              value,
+            })
+          );
+          setRegionData(formattedRegionData);
+        } else {
+          console.error('API 返回错误:', data.message);
+        }
       } catch (err) {
         console.error('数据加载失败:', err);
       } finally {
@@ -179,366 +300,263 @@ const HomePage: React.FC = () => {
     };
 
     fetchData();
-  }, [dateRange]);
+  }, [timeState, visitorState, deviceState, sourceState]); // 添加所有筛选条件作为依赖
 
-  // 初始化图表实例
+  // 初始化图表
   useEffect(() => {
-    if (chartRef.current) {
-      const chart = echarts.init(chartRef.current);
-      setChartInstance(chart);
-      setLoading(false);
+    // 确保DOM元素存在
+    if (!chartRef.current) return;
 
-      // 清理函数
-      return () => {
-        chart.dispose();
-        setChartInstance(null);
-      };
-    }
+    // 创建图表实例
+    const chart = echarts.init(chartRef.current);
+    setChartInstance(chart);
+
+    // 清理函数
+    return () => {
+      chart.dispose();
+    };
   }, []);
-
-  // 更新图表数据
-  useEffect(() => {
-    if (chartInstance && trendData) {
-      const option = {
-        grid: {
-          top: 30,
-          right: 30,
-          bottom: 20,
-          left: 50,
-          containLabel: true,
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'cross',
-          },
-        },
-        legend: {
-          data: ['浏览量', '访问次数'],
-          top: 0,
-          right: 10,
-        },
-        xAxis: {
-          type: 'category',
-          data: trendData.map((item) => item.time),
-          axisLabel: {
-            interval: 2,
-            rotate: 45,
-          },
-          boundaryGap: false,
-        },
-        yAxis: {
-          type: 'value',
-          splitLine: {
-            show: true,
-            lineStyle: {
-              type: 'dashed',
-            },
-          },
-        },
-        series: [
-          {
-            name: '浏览量',
-            type: 'line',
-            data: trendData.map((item) => item.pageviews),
-            symbol: 'circle',
-            symbolSize: 6,
-            itemStyle: {
-              color: '#1890ff',
-            },
-            lineStyle: {
-              width: 2,
-              color: '#1890ff',
-            },
-            smooth: true,
-          },
-          {
-            name: '访问次数',
-            type: 'line',
-            data: trendData.map((item) => item.visits),
-            symbol: 'circle',
-            symbolSize: 6,
-            itemStyle: {
-              color: '#fadb14',
-            },
-            lineStyle: {
-              width: 2,
-              color: '#fadb14',
-            },
-            smooth: true,
-          },
-        ],
-      };
-
-      chartInstance.setOption(option, true);
-    }
-  }, [chartInstance, trendData, startDate, endDate]);
 
   // 处理窗口大小变化
   useEffect(() => {
     const handleResize = () => {
-      if (chartInstance) {
-        chartInstance.resize();
-      }
+      chartInstance?.resize();
     };
 
     window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => window.removeEventListener('resize', handleResize);
   }, [chartInstance]);
 
-  // 环境统计饼图
-  useEffect(() => {
-    if (envChartRef.current && statsData?.environmentStats) {
-      const chart = echarts.init(envChartRef.current);
-      const option = {
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b}: {c} ({d}%)',
-        },
-        legend: {
-          orient: 'vertical',
-          right: 10,
-          top: 'center',
-          textStyle: {
-            color: '#666',
-          },
-        },
-        series: [
-          {
-            name: '环境分布',
-            type: 'pie',
-            radius: ['50%', '70%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2,
-            },
-            label: {
-              show: false,
-              position: 'center',
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: '18',
-                fontWeight: 'bold',
-              },
-            },
-            labelLine: {
-              show: false,
-            },
-            data: statsData.environmentStats.map((env) => ({
-              name: env.environment,
-              value: env.pv,
-            })),
-          },
-        ],
-      };
-      chart.setOption(option);
-    }
-  }, [statsData]);
+  // 页面概览表格列定义
+  const pageInfoColumns: ColumnsType<any> = [
+    {
+      title: '指标',
+      dataIndex: 'metric',
+      key: 'metric',
+      width: '50%',
+    },
+    {
+      title: '数值',
+      dataIndex: 'value',
+      key: 'value',
+      width: '50%',
+    },
+  ];
 
-  // 设备统计柱状图
-  useEffect(() => {
-    if (deviceChartRef.current && statsData?.deviceStats) {
-      const chart = echarts.init(deviceChartRef.current);
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true,
-        },
-        xAxis: {
-          type: 'category',
-          data: statsData.deviceStats.map(
-            (device) => device.deviceInfo.deviceType
-          ),
-          axisLabel: {
-            interval: 0,
-            rotate: 30,
-          },
-        },
-        yAxis: {
-          type: 'value',
-        },
-        series: [
-          {
-            type: 'bar',
-            data: statsData.deviceStats.map((device) => ({
-              value: device.count,
-              itemStyle: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                  { offset: 0, color: '#83bff6' },
-                  { offset: 0.5, color: '#188df0' },
-                  { offset: 1, color: '#188df0' },
-                ]),
-              },
-            })),
-            showBackground: true,
-            backgroundStyle: {
-              color: 'rgba(180, 180, 180, 0.2)',
-            },
-          },
-        ],
-      };
-      chart.setOption(option);
-    }
-  }, [statsData]);
+  // 页面概览数据
+  const pageInfoData = [
+    {
+      key: '1',
+      metric: '浏览量(PV)',
+      value: statsData?.pageInfo.totalPV || 0,
+    },
+    {
+      key: '2',
+      metric: '访客数(UV)',
+      value: statsData?.pageInfo.totalUV || 0,
+    },
+  ];
+
+  // 环境统计表格列定义
+  const envColumns: ColumnsType<any> = [
+    {
+      title: '环境',
+      dataIndex: 'environment',
+      key: 'environment',
+      width: '25%',
+    },
+    {
+      title: 'PV',
+      dataIndex: 'pv',
+      key: 'pv',
+      width: '25%',
+    },
+    {
+      title: '首次访问',
+      dataIndex: 'firstVisit',
+      key: 'firstVisit',
+      width: '25%',
+      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
+      title: '最后访问',
+      dataIndex: 'lastVisit',
+      key: 'lastVisit',
+      width: '25%',
+      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
+    },
+  ];
+
+  // 设备统计表格列定义
+  const deviceColumns: ColumnsType<any> = [
+    {
+      title: '操作系统',
+      dataIndex: 'os',
+      key: 'os',
+      width: '20%',
+      render: (text, record) =>
+        `${record.deviceInfo.os} ${record.deviceInfo.osVersion}`,
+    },
+    {
+      title: '浏览器',
+      dataIndex: 'browser',
+      key: 'browser',
+      width: '20%',
+      render: (text, record) =>
+        `${record.deviceInfo.browser} ${record.deviceInfo.browserVersion}`,
+    },
+    {
+      title: '设备类型',
+      dataIndex: 'deviceType',
+      key: 'deviceType',
+      width: '20%',
+      render: (text, record) => record.deviceInfo.deviceType,
+    },
+    {
+      title: '地区',
+      dataIndex: 'region',
+      key: 'region',
+      width: '20%',
+      render: (text, record) => record.deviceInfo.region,
+    },
+    {
+      title: '访问次数',
+      dataIndex: 'count',
+      key: 'count',
+      width: '20%',
+    },
+  ];
 
   // 模块统计表格列定义
-  const columns = [
+  const moduleColumns: ColumnsType<any> = [
     {
       title: '模块ID',
       dataIndex: 'moduleId',
       key: 'moduleId',
+      width: '50%',
     },
     {
       title: '点击次数',
       dataIndex: 'clickCount',
       key: 'clickCount',
-      sorter: (a: any, b: any) => a.clickCount - b.clickCount,
+      width: '50%',
+      render: (text, record) => record._count.id,
     },
   ];
 
-  // 日期选择处理函数
-  const onStartDateChange = (date: dayjs.Dayjs | null) => {
-    setStartDate(date);
-  };
-
-  const onEndDateChange = (date: dayjs.Dayjs | null) => {
-    setEndDate(date);
-  };
-
-  // 添加 fetchData 函数
-  const fetchData = async (start: dayjs.Dayjs, end: dayjs.Dayjs) => {
-    try {
-      setLoading(true);
-      const response = await axios.get('/api/trend-data', {
-        params: {
-          startDate: start.format('YYYY-MM-DD HH:mm:ss'),
-          endDate: end.format('YYYY-MM-DD HH:mm:ss'),
-        },
-      });
-
-      if (response.data) {
-        setTrendData(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-      // 可以添加错误处理，比如显示提示信息
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 确认按钮处理函数
-  const handleDateConfirm = () => {
-    if (startDate && endDate) {
-      fetchData(startDate, endDate);
-    }
-  };
-
   return (
     <div>
-      <RangePicker onChange={onChange} needConfirm />
-      <div style={{ padding: 24 }}>
-        {loading ? (
-          <Skeleton active paragraph={{ rows: 4 }} />
-        ) : (
+      {/* Fixed Header */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 65,
+          width: '100%',
+          height: 93,
+          zIndex: 1,
+          background: '#fff',
+          borderBottom: '1px solid #f0f0f0',
+          padding: '0 0px',
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
+        <TimeSelector
+          time={timeState}
+          onChangeTime={onChangeTime}
+        ></TimeSelector>
+
+        <VisitorSelector
+          visitor={visitorState}
+          onChangeVisitor={onChangeVisitor}
+        ></VisitorSelector>
+        <div style={{ width: '100%' }} />
+        <DeviceSelector
+          device={deviceState}
+          onChangeDevice={onChangeDevice}
+        ></DeviceSelector>
+        <SourceSelector
+          source={sourceState}
+          onChangeSource={onChangeSource}
+        ></SourceSelector>
+      </div>
+
+      {/* Content Area */}
+      <Content
+        style={{
+          marginTop: 80, // 65 + 93 = 158
+          padding: '0 24px',
+          minHeight: '100vh',
+          background: '#fff',
+        }}
+      >
+        <div style={{}}>
           <Row gutter={[16, 16]}>
-            {/* 页面概览 */}
+            {/* Page Info Card */}
             <Col xs={24} sm={12} md={12} lg={12} xl={12}>
               <Card
                 title="页面概览"
                 bordered={false}
                 hoverable
-                style={{ height: 400 }}
+                style={{ height: 300 }}
               >
-                <Statistic
-                  title="总浏览量"
-                  value={statsData?.pageInfo.totalPV}
-                  prefix={<EyeOutlined />}
-                  valueStyle={{ color: '#1890ff', fontSize: 24 }}
-                />
-                <Progress
-                  percent={90}
-                  strokeWidth={12}
-                  strokeColor={{
-                    '0%': '#108ee9',
-                    '100%': '#87d068',
-                  }}
-                  style={{ margin: '20px 0' }}
-                />
-                <Statistic
-                  title="独立访客"
-                  value={statsData?.pageInfo.totalUV}
-                  prefix={<UserOutlined />}
-                  valueStyle={{ color: '#52c41a', fontSize: 24 }}
-                />
-                <Progress
-                  percent={75}
-                  strokeWidth={12}
-                  strokeColor={{
-                    '0%': '#52c41a',
-                    '100%': '#95de64',
-                  }}
-                  style={{ margin: '20px 0' }}
+                <Table
+                  columns={pageInfoColumns}
+                  dataSource={pageInfoData}
+                  pagination={false}
+                  size="small"
                 />
               </Card>
             </Col>
 
-            {/* 环境统计 */}
+            {/* Environment Stats Card */}
             <Col xs={24} sm={12} md={12} lg={12} xl={12}>
               <Card
                 title="环境统计"
                 bordered={false}
                 hoverable
-                style={{ height: 400 }}
+                style={{ height: 300 }}
               >
-                <div ref={envChartRef} style={{ height: 250 }} />
+                <Table
+                  columns={envColumns}
+                  dataSource={statsData?.environmentStats || []}
+                  pagination={false}
+                  size="small"
+                />
               </Card>
             </Col>
 
-            {/* 设备统计 */}
+            {/* Device Stats Card */}
             <Col xs={24} sm={12} md={12} lg={12} xl={12}>
               <Card
                 title="设备统计"
                 bordered={false}
                 hoverable
-                style={{ height: 400 }}
+                style={{ height: 300 }}
               >
-                <div ref={deviceChartRef} style={{ height: 250 }} />
+                <Table
+                  columns={deviceColumns}
+                  dataSource={statsData?.deviceStats || []}
+                  pagination={false}
+                  size="small"
+                />
               </Card>
             </Col>
 
-            {/* 模块统计 */}
+            {/* Module Stats Card */}
             <Col xs={24} sm={12} md={12} lg={12} xl={12}>
               <Card
                 title="模块统计"
                 bordered={false}
                 hoverable
-                style={{ height: 400 }}
+                style={{ height: 300 }}
               >
                 <Table
-                  columns={columns}
-                  dataSource={statsData?.moduleStats.modules.map((module) => ({
-                    key: module.moduleId,
-                    moduleId: module.moduleId,
-                    clickCount: module._count.id,
-                  }))}
+                  columns={moduleColumns}
+                  dataSource={statsData?.moduleStats.modules || []}
                   pagination={false}
-                  scroll={{ y: 200 }}
+                  size="small"
                 />
               </Card>
             </Col>
@@ -552,29 +570,20 @@ const HomePage: React.FC = () => {
 
             {/* Trend Chart Card */}
             <Col xs={24} sm={12} md={12} lg={12} xl={12}>
-              <Card
-                title="趋势图"
-                bordered={false}
-                hoverable
-                style={{ height: 300 }}
-              >
-                {loading ? (
-                  <Skeleton active />
-                ) : (
-                  <div
-                    ref={chartRef}
-                    style={{
-                      width: '100%',
-                      height: '250px',
-                      margin: '0 auto',
-                    }}
-                  />
-                )}
+              <Card title="趋势图" bordered={false} hoverable>
+                <div
+                  ref={chartRef}
+                  style={{
+                    width: '100%',
+                    height: 300,
+                    margin: '0 auto',
+                  }}
+                />
               </Card>
             </Col>
           </Row>
-        )}
-      </div>
+        </div>
+      </Content>
     </div>
   );
 };
