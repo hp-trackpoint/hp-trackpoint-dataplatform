@@ -4,12 +4,14 @@ import HomePage from './pages/HomePage';
 import AppCrashAnalysisPage from './pages/AppCrashAnalysisPage';
 import EventAnalysisPage from './pages/EventAnalysisPage';
 import TrendAnalysisPage from './pages/TrendAnalysisPage';
-import UserAnalysisPage from './pages/UserAnalysisPage';
+import UserAnalysisPage from './pages/UserAnalysis/UserAnalysisPage';
 import NotFoundPage from './pages/NotFound';
 import TrackPointLayout from './layouts/TrackPointLayout';
 import PageTrackPointManagePage from './pages/PageTrackPointManagePage';
 import ModuleTrackPointManagePage from './pages/ModuleTrackPointManagePage';
 import RegionalAnalysisPage from './pages/RegionalAnalysis';
+import EntrancePage from './pages/EntrancePage/EntrancePage';
+import VisitedPage from './pages/VisitedPage/VisitedPage';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -27,6 +29,13 @@ export const router = createBrowserRouter([
           { path: 'regionalanalysis', element: <RegionalAnalysisPage /> },
 
           { path: 'useranalysis', element: <UserAnalysisPage /> },
+        ],
+      },
+      {
+        path: 'visitanalysis',
+        children: [
+          { path: 'visited', element: <VisitedPage /> },
+          { path: 'entrance', element: <EntrancePage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },

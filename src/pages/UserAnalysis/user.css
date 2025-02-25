@@ -1,0 +1,77 @@
+.card {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 20px;
+  margin-top: 103px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  width: 95%;
+  margin-left: 0;
+  align-self: flex-start;
+  padding: 10px;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 鼠标悬停时增加阴影的深度 */
+}
+.pie {
+  display: flex;
+  width: 95%;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  margin-left: 0;
+  align-self: flex-start;
+  padding: 10px;
+}
+
+.pie:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* histogram 类样式 */
+.histogram {
+  display: flex;
+  width: 95%;
+  justify-content: space-around;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  margin-left: 0;
+  align-self: flex-start;
+  margin-bottom: 30px;
+  padding: 10px;
+}
+
+.histogram:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* line 类样式 */
+.line {
+  width: 95%;
+  height: 450px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  margin-left: 0;
+  align-self: flex-start;
+  margin-bottom: 25px;
+  padding: 10px;
+}
+
+.line:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
