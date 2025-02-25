@@ -3,10 +3,11 @@ import {
   VisitorSelector,
   DeviceSelector,
   SourceSelector,
-} from '../layouts/SelectHeader';
-import createHeaderState from '../stores/headerStore';
+} from '../../layouts/SelectHeader';
+import createHeaderState from '../../stores/headerStore';
 import { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
+import './user.css';
 // 定义数据类型
 type ChartData = {
   name: string;
@@ -220,15 +221,7 @@ export default function UserAnalysisPage() {
   }, []);
 
   return (
-    <div
-      style={{
-        background: 'white',
-        paddingTop: '10px',
-        paddingRight: '20px',
-        paddingBottom: '15px',
-        paddingLeft: '25px',
-      }}
-    >
+    <div>
       <div
         style={{
           position: 'fixed',
@@ -263,18 +256,7 @@ export default function UserAnalysisPage() {
           onChangeSource={onChangeSource}
         ></SourceSelector>
       </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '20px',
-          padding: '20px',
-          marginTop: 103,
-          marginLeft: 20,
-          marginRight: 20,
-          marginBottom: 20,
-        }}
-      >
+      <div className="card">
         <div>
           <h2 style={{ color: 'rgb(135, 206, 250)', textAlign: 'center' }}>
             新用户
@@ -304,18 +286,12 @@ export default function UserAnalysisPage() {
         </div>
       </div>
       {/* 饼状图容器 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          marginBottom: '20px',
-        }}
-      >
+      <div className="pie">
         <div ref={pvChartRef} style={{ width: '500px', height: '500px' }}></div>
         <div ref={uvChartRef} style={{ width: '500px', height: '500px' }}></div>
       </div>
       {/* 柱状图容器 */}
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+      <div className="histogram">
         <div
           ref={bounceRateChartRef}
           style={{ width: '400px', height: '400px' }}
@@ -329,10 +305,7 @@ export default function UserAnalysisPage() {
           style={{ width: '400px', height: '400px' }}
         ></div>
       </div>{' '}
-      <div
-        ref={newVisitorChartRef}
-        style={{ width: '1700px', height: '450px', margin: '0 auto' }}
-      ></div>
+      <div ref={newVisitorChartRef} className="line"></div>
     </div>
   );
 }

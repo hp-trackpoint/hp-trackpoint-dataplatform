@@ -1,0 +1,18 @@
+.popover {
+  white-space: pre-wrap;
+  width: 200px;
+}
+
+.span {
+  font-size: 15px;
+  color: gray;
+}
+.number {
+  font-size: 25px;
+  color: black;
+  margin-top: 5px;
+}
+.content {
+  white-space: pre-wrap;
+  width: 200px;
+}

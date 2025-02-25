@@ -51,35 +51,14 @@ const items: MenuItem[] = [
     children: [
       {
         key: 'pageanalysis',
-        label: <Link to="/pageanalysis">受访页面</Link>,
+        label: <Link to="visitanalysis/visited">受访页面</Link>,
       },
       {
         key: 'entryanalysis',
-        label: <Link to="/entryanalysis">入口页面</Link>,
+        label: <Link to="visitanalysis/entrance">入口页面</Link>,
       },
     ],
   },
-  // {
-  //   key: 'useranalysis',
-  //   icon: <TeamOutlined />,
-  //   label: '用户分析',
-
-  //   children: [
-  //     {
-  //       key: 'loyaltyanalysis',
-  //       label: <Link to="/loyaltyanalysis">忠诚度分析</Link>,
-  //     },
-  //     {
-  //       key: 'userportrait',
-  //       label: <Link to="/userportrait">用户画像</Link>,
-  //     },
-  //   ],
-  // },
-  // {
-  //   key: 'appcrash',
-  //   icon: <FundViewOutlined />,
-  //   label: <Link to="/appcrash">App崩溃分析</Link>,
-  // },
   {
     key: 'performanceanalysis',
     icon: <FundViewOutlined />,
@@ -90,12 +69,6 @@ const items: MenuItem[] = [
     icon: <ReconciliationOutlined />,
     label: <Link to="/eventanalysis">事件分析</Link>,
   },
-  //
-  // {
-  //   key: 'warninganalysis',
-  //   icon: <FundViewOutlined />,
-  //   label: <Link to="/warninganalysis">预警分析</Link>,
-  // },
 ];
 
 const SiderMenu: React.FC = () => {
