@@ -12,6 +12,7 @@ import ModuleTrackPointManagePage from './pages/ModuleTrackPointManagePage';
 import RegionalAnalysisPage from './pages/RegionalAnalysis';
 import EntrancePage from './pages/EntrancePage/EntrancePage';
 import VisitedPage from './pages/VisitedPage/VisitedPage';
+import PerformanceAnalysisPage from './pages/PerformanceAnalysis';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
           { path: 'entrance', element: <EntrancePage /> },
         ],
       },
+      { path: 'performanceanalysis', element: <PerformanceAnalysisPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
