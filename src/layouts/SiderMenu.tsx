@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import {
   SwitcherOutlined,
@@ -12,7 +12,6 @@ import {
 import type { MenuProps } from 'antd';
 
 const { Sider } = Layout;
-
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
@@ -30,16 +29,14 @@ const items: MenuItem[] = [
     key: 'visitoranalysis',
     icon: <UserOutlined />,
     label: '访客分析',
-
     children: [
       {
         key: 'regionalanalysis',
-        label: <Link to="visitoranalysis/regionalanalysis">地域分析</Link>,
+        label: <Link to="/visitoranalysis/regionalanalysis">地域分析</Link>,
       },
       {
-        //新老访客
         key: 'deviceanalysis',
-        label: <Link to="visitoranalysis/useranalysis">新老访客</Link>,
+        label: <Link to="/visitoranalysis/useranalysis">新老访客</Link>,
       },
     ],
   },
@@ -47,15 +44,14 @@ const items: MenuItem[] = [
     key: 'visitanalysis',
     icon: <SlidersOutlined />,
     label: '访问分析',
-
     children: [
       {
         key: 'pageanalysis',
-        label: <Link to="visitanalysis/visited">受访页面</Link>,
+        label: <Link to="/visitanalysis/visited">受访页面</Link>,
       },
       {
         key: 'entryanalysis',
-        label: <Link to="visitanalysis/entrance">入口页面</Link>,
+        label: <Link to="/visitanalysis/entrance">入口页面</Link>,
       },
     ],
   },
@@ -71,7 +67,26 @@ const items: MenuItem[] = [
   },
 ];
 
+const pathToKeyMap: { [path: string]: string } = {
+  '/': 'home',
+  '/trendanalysis': 'trendanalysis',
+  '/visitoranalysis/regionalanalysis': 'regionalanalysis',
+  '/visitoranalysis/useranalysis': 'deviceanalysis',
+  '/visitanalysis/visited': 'pageanalysis',
+  '/visitanalysis/entrance': 'entryanalysis',
+  '/performanceanalysis': 'performanceanalysis',
+  '/eventanalysis': 'eventanalysis',
+};
+
 const SiderMenu: React.FC = () => {
+  const location = useLocation();
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    const key = pathToKeyMap[location.pathname] || 'home';
+    setSelectedKeys([key]);
+  }, [location.pathname]);
+
   return (
     <Sider
       collapsible
@@ -87,7 +102,7 @@ const SiderMenu: React.FC = () => {
       }}
     >
       <Menu
-        defaultSelectedKeys={['home']}
+        selectedKeys={selectedKeys}
         mode="inline"
         theme="light"
         items={items}
