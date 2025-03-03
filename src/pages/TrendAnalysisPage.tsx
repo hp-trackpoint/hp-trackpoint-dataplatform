@@ -433,9 +433,9 @@ export default function TrendAnalysisPage() {
       {/* 固定 Header */}
       <div
         style={{
-          position: 'fixed',
-          top: 65, // 关键定位参数
-          width: '100%',
+          position: 'sticky',  // 改为sticky定位而不是fixed
+          top: 0,              // 调整顶部位置
+          width: 'auto',       // 宽度自动调整
           height: 93,
           zIndex: 1,
           background: '#fff',
@@ -470,8 +470,9 @@ export default function TrendAnalysisPage() {
       <Content style={{ marginTop: 78, padding: '0 0px' }}>
         <div style={{ background: '#fff', padding: 0, minHeight: '100vh' }}>
           {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <></>}
-          <Space direction="vertical" size={16}>
-            <Card title="" style={{ width: '80vw', height: 500 }}>
+          {/* 侧边栏会收缩，width 使用缩放，不能固定 */}
+          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <Card title="" style={{ width: '100%', height: 500 }}>
               <h2>流量概览</h2>
               <Table
                 columns={columns}
@@ -483,10 +484,11 @@ export default function TrendAnalysisPage() {
               />
             </Card>
           </Space>
-          <Space direction="vertical" size={16}>
-            <Card style={{ width: '80vw', height: 500 }}>
+          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <Card style={{ width: '100%', height: 500 }}>
               <h2>趋势图</h2>
-              <div ref={chartRef} style={{ width: '900', height: '400px' }} />
+              {/* 同理，width 使用缩放，不能固定 */}
+              <div ref={chartRef} style={{ width: '100%', height: '400px' }} />
             </Card>
           </Space>
         </div>
