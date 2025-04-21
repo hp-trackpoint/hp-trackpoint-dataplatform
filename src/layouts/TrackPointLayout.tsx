@@ -1,9 +1,9 @@
-import { Layout,Menu } from 'antd';
-import { Outlet,Link } from 'react-router-dom';
+import { Layout, Menu } from 'antd';
+import React, { useState } from 'react';
+import { Outlet, Link } from 'react-router-dom';
 import AppHeader from './Header';
 
 const { Content } = Layout;
-
 
 import {
   ProfileOutlined,
@@ -34,12 +34,22 @@ const items: MenuItem[] = [{
     ],
   },]
 
-const SiderMenu = () => {
+const SiderMenu = ({ onCollapse }: { onCollapse: (collapsed: boolean) => void }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  
+  const handleCollapse = (isCollapsed: boolean) => {
+    setCollapsed(isCollapsed);
+    onCollapse(isCollapsed);
+  };
+  
   return (
     <Sider
       collapsible
+      collapsed={collapsed}
+      onCollapse={handleCollapse}
       theme="light"
       width={210}
+      collapsedWidth={80}
       style={{
         position: 'fixed',
         height: '100vh',
@@ -60,13 +70,22 @@ const SiderMenu = () => {
 };
 
 
-export default function TrackPointLayout() {
+const TrackPointLayout: React.FC = () => {
+  // 和主页面 index.tsx 的实现一样，不再赘述
+  const [siderCollapsed, setSiderCollapsed] = useState(false);
+
+  const handleSiderCollapse = (collapsed: boolean) => {
+    setSiderCollapsed(collapsed);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      {/* 侧边栏 */}
+      <SiderMenu onCollapse={handleSiderCollapse} />
       
-    <SiderMenu />
-      <Layout style={{ marginLeft: 200 }}>
+      <Layout style={{ 
+        marginLeft: siderCollapsed ? 80 : 210,
+        transition: 'margin-left 0.2s'
+      }}>
         {/* 顶部导航栏 */}
         <AppHeader />
 
@@ -83,4 +102,6 @@ export default function TrackPointLayout() {
       </Layout>
     </Layout>
   );
-}
+};
+
+export default TrackPointLayout;

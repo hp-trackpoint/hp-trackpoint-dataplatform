@@ -78,20 +78,37 @@ const pathToKeyMap: { [path: string]: string } = {
   '/eventanalysis': 'eventanalysis',
 };
 
-const SiderMenu: React.FC = () => {
+// 要向父组件传递收缩状态，使得主页面得知收缩状态後也要收缩
+interface SiderMenuProps {
+  onCollapse?: (collapsed: boolean) => void;
+}
+
+const SiderMenu: React.FC<SiderMenuProps> = ({ onCollapse }) => {
   const location = useLocation();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const key = pathToKeyMap[location.pathname] || 'home';
     setSelectedKeys([key]);
   }, [location.pathname]);
 
+  // 处理收缩状态变化
+  const handleCollapse = (isCollapsed: boolean) => {
+    setCollapsed(isCollapsed);
+    if (onCollapse) {
+      onCollapse(isCollapsed);
+    }
+  };
+
   return (
     <Sider
       collapsible
+      collapsed={collapsed}
+      onCollapse={handleCollapse}
       theme="light"
-      width={210}
+      width={210}          // 展开的宽度
+      collapsedWidth={80}  // 收缩的宽度
       style={{
         position: 'fixed',
         height: '100vh',
